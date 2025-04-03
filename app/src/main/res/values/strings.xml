@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">AnalysisGame</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading</string>
+    <string name="loading_failed">Loading failed</string>
+
+    <!-- navigation text -->
+    <string name="home">Home</string>
+    <string name="bookings">Bookings</string>
+    <string name="favourites">Favourites</string>
+    <string name="profile">Profile</string>
+</resources>

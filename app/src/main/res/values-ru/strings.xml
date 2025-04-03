@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="retry">снова</string>
+    <string name="loading">загрузка</string>
+    <string name="loading_failed">произошла ошибка</string>
+
+    <!-- navigation text -->
+    <string name="home">дом</string>
+    <string name="bookings">книги</string>
+    <string name="favourites">любимые</string>
+    <string name="profile">профиль</string>
+</resources>
