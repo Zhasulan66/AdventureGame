@@ -12,7 +12,7 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.common.Constants
 import com.example.analysisgame.domain.entities.GameCharacters
-import com.example.analysisgame.domain.environments.GameMap
+import com.example.analysisgame.domain.environments.MapManager
 import com.example.analysisgame.domain.inputs.TouchEvents
 import java.util.Random
 import kotlin.math.abs
@@ -23,8 +23,10 @@ import kotlin.math.sin
 
 class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callback {
     private val redPaint = Paint()
-    private var x = 0f
-    private var y = 0f
+    private val playerX = (GAME_WIDTH / 2).toFloat() - Constants.Sprite.SIZE
+    private val playerY = (GAME_HEIGHT / 2).toFloat() - Constants.Sprite.SIZE
+    private var cameraX = 0f
+    private var cameraY = 0f
     private var rand = Random()
     private var gameLoop: GameLoop
     private var touchEvents = TouchEvents(this)
@@ -43,31 +45,13 @@ class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callbac
     private var skeletonPos =
         PointF(rand.nextInt(GAME_WIDTH).toFloat(), rand.nextInt(GAME_HEIGHT).toFloat())
 
-    //Testing map
-    private var testMap: GameMap
+    private val mapManager = MapManager()
 
 
     init {
         holder.addCallback(this)
         redPaint.color = Color.RED
         gameLoop = GameLoop(this)
-
-        val spriteIds = arrayOf(
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-            intArrayOf(1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1),
-        )
-
-        testMap = GameMap(spriteIds)
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -82,21 +66,21 @@ class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callbac
         if (canvas != null) {
             canvas.drawColor(Color.BLUE) // Clear previous frame
 
-            testMap.draw(canvas)
+            mapManager.draw(canvas)
 
             touchEvents.draw(canvas)
 
             canvas.drawBitmap(
                 GameCharacters.ROGUE.getSprite(playerFaceDir, playerAniIndexX),
-                x,
-                y,
+                playerX,
+                playerY,
                 null
             )
 
             canvas.drawBitmap(
                 GameCharacters.SKELETON.getSprite(skeletonFaceDir, playerAniIndexX),
-                skeletonPos.x,
-                skeletonPos.y,
+                skeletonPos.x + cameraX,
+                skeletonPos.y + cameraY,
                 null
             )
 
@@ -106,6 +90,9 @@ class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callbac
     }
 
     fun update(delta: Double) {
+        updatePlayerMove(delta)
+        mapManager.setCameraValues(cameraX, cameraY)
+
         if (System.currentTimeMillis() - lastDirChange >= 5000) {
             skeletonDir = rand.nextInt(4)
             lastDirChange = System.currentTimeMillis()
@@ -135,8 +122,6 @@ class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callbac
             }
         }
 
-        updatePlayerMove(delta)
-
         updateAnimation()
     }
 
@@ -165,8 +150,25 @@ class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callbac
             ySpeed *= -1
         }
 
-        x += xSpeed * baseSpeed
-        y += ySpeed * baseSpeed
+        var pWidth = Constants.Sprite.SIZE * 2
+        var pHeight = Constants.Sprite.SIZE * 2
+
+        if(xSpeed <= 0){
+            pWidth = 0
+        }
+        if(ySpeed <= 0){
+            pHeight = 0
+        }
+
+        val deltaX = xSpeed * baseSpeed * -1
+        val deltaY = ySpeed * baseSpeed * -1
+
+        if(mapManager.canMoveHere(
+                playerX + cameraX * -1 + deltaX * -1 + pWidth,
+                playerY + cameraY * -1 + deltaY * -1 + pHeight)){
+            cameraX += deltaX
+            cameraY += deltaY
+        }
 
     }
 
