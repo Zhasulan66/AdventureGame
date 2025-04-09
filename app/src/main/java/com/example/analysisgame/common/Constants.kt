@@ -33,4 +33,9 @@ class Constants {
         const val SCALE_MULTIPLIER = 6
         const val SIZE = SMALLER_SIZE * SCALE_MULTIPLIER
     }
+
+    object Animation {
+        const val SPEED: Int = 10
+        const val AMOUNT: Int = 4
+    }
 }
