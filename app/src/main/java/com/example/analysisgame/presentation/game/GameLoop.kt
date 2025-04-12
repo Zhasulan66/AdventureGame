@@ -1,7 +1,7 @@
 package com.example.analysisgame.presentation.game
 
 class GameLoop(
-    private var gamePanel: GamePanel
+    private var game: Game
 ) : Runnable {
     private var gameThread: Thread = Thread(this)
 
@@ -19,8 +19,8 @@ class GameLoop(
             val timeSinceLastDelta = nowDelta - lastDelta
             val delta = timeSinceLastDelta / nanoSec.toDouble()
 
-            gamePanel.update(delta)
-            gamePanel.render()
+            game.update(delta)
+            game.render()
             lastDelta = nowDelta
 
             fps++
