@@ -1,12 +1,11 @@
 package com.example.analysisgame.domain.gamestates
 
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.PointF
 import android.view.MotionEvent
 import com.example.analysisgame.common.Constants
 import com.example.analysisgame.domain.entities.Character
+import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.environments.MapManager
@@ -14,7 +13,6 @@ import com.example.analysisgame.presentation.game.Game
 import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.cos
-import kotlin.math.hypot
 import kotlin.math.sin
 
 
@@ -23,24 +21,14 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
     private var cameraX = 0f
     private var cameraY = 0f
     private var movePlayer = false
-    private var lastTouchDiff = PointF(0f, 0f)
     private val mapManager = MapManager()
 
     private val player = Player()
     private val skeletons = ArrayList<Skeleton>()
+    //private val arrowList = ArrayList<Arrow>()
 
     //For UI
-    private val xCenter = 250f
-    private val yCenter = 800f
-    private val radius = 150f
-    private val circlePaint: Paint = Paint().apply {
-        color = Color.RED
-        style = Paint.Style.STROKE
-        strokeWidth = 10f
-    }
-    private var xTouch = 0f
-    private var yTouch = 0f
-    private var touchDown = false
+    private val joystick = Joystick(250f, 800f, 150f, 80f)
 
     init {
         for (i in 0..20)
@@ -48,6 +36,7 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
     }
 
     override fun update(delta: Double) {
+        joystick.update()
         updatePlayerMove(delta)
         player.update(delta, movePlayer)
         for (skeleton in skeletons) skeleton.update(delta)
@@ -56,7 +45,6 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
 
     override fun render(c: Canvas) {
         mapManager.draw(c)
-        drawUI(c)
 
         drawPlayer(c)
         for(skeleton in skeletons)
@@ -65,10 +53,8 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
                 skeleton
             )
 
-    }
+        joystick.draw(c)
 
-    private fun drawUI(c: Canvas){
-        c.drawCircle(xCenter, yCenter, radius, circlePaint)
     }
 
     private fun drawPlayer(c: Canvas) {
@@ -95,22 +81,22 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
         }
 
         val baseSpeed = (delta * 300).toFloat()
-        val ratio = abs(lastTouchDiff.y) / abs(lastTouchDiff.x)
+        val ratio = abs(joystick.getActuatorY()) / abs(joystick.getActuatorX())
         val angle = atan(ratio)
 
         var xSpeed = cos(angle)
         var ySpeed = sin(angle)
 
         if (xSpeed > ySpeed) {
-            if (lastTouchDiff.x > 0) {
+            if (joystick.getActuatorX() > 0) {
                 player.setFaceDir(Constants.FaceDir.RIGHT)
             } else player.setFaceDir(Constants.FaceDir.LEFT)
         } //else face dir for up and down
 
-        if (lastTouchDiff.x < 0) {
+        if (joystick.getActuatorX() < 0) {
             xSpeed *= -1
         }
-        if (lastTouchDiff.y < 0) {
+        if (joystick.getActuatorY() < 0) {
             ySpeed *= -1
         }
 
@@ -124,8 +110,8 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
             pHeight = 0
         }
 
-        val deltaX = xSpeed * baseSpeed * -1
-        val deltaY = ySpeed * baseSpeed * -1
+        val deltaX = (xSpeed * baseSpeed * -1).toFloat()
+        val deltaY = (ySpeed * baseSpeed * -1).toFloat()
 
         if(mapManager.canMoveHere(
                 player.getHitBox().left + cameraX * -1 + deltaX * -1 + pWidth,
@@ -136,11 +122,6 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
 
     }
 
-    private fun setPlayerMoveTrue(lastTouchDiff: PointF) {
-        movePlayer = true
-        this.lastTouchDiff = lastTouchDiff
-    }
-
     private fun setPlayerMoveFalse() {
         movePlayer = false
         player.resetAnimation()
@@ -149,34 +130,23 @@ class Playing(game: Game) : BaseState(game), GameStateInterface {
     override fun touchEvents(event: MotionEvent) {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                val x = event.x
-                val y = event.y
-
-                val a = abs((x - xCenter))
-                val b = abs((y - yCenter))
-                val c = hypot(a, b)
-
-                if (c <= radius) {
-                    touchDown = true
-                    xTouch = x
-                    yTouch = y
-                } else getGame().currentGameState = Game.GameState.MENU
+                if (joystick.isPressed(event.x, event.y)) {
+                    joystick.setIsPressed(true)
+                }
+                else getGame().currentGameState = Game.GameState.MENU
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (touchDown) {
-                    xTouch = event.x
-                    yTouch = event.y
 
-                    val xDiff = xTouch - xCenter
-                    val yDiff = yTouch - yCenter
-
-                    setPlayerMoveTrue(PointF(xDiff, yDiff))
+                if (joystick.getIsPressed()) {
+                    joystick.setActuator(event.x.toDouble(), event.y.toDouble())
+                    movePlayer = true
                 }
             }
 
             MotionEvent.ACTION_UP -> {
-                touchDown = false
+                joystick.setIsPressed(false)
+                joystick.resetActuator()
                 setPlayerMoveFalse()
             }
         }
