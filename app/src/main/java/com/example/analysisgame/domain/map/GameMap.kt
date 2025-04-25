@@ -1,4 +1,4 @@
-package com.example.analysisgame.domain.environments
+package com.example.analysisgame.domain.map
 
 class GameMap(private var spriteIds: Array<IntArray>) {
 

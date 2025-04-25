@@ -5,6 +5,9 @@ class GameLoop(
 ) : Runnable {
     private var gameThread: Thread = Thread(this)
 
+    companion object {
+        var delta: Double = 0.0
+    }
 
     override fun run() {
 
@@ -17,7 +20,7 @@ class GameLoop(
         while (true){
             val nowDelta = System.nanoTime()
             val timeSinceLastDelta = nowDelta - lastDelta
-            val delta = timeSinceLastDelta / nanoSec.toDouble()
+            delta = timeSinceLastDelta / nanoSec.toDouble()
 
             game.update(delta)
             game.render()
@@ -37,4 +40,5 @@ class GameLoop(
     fun startGameLoop(){
         gameThread.start()
     }
+
 }

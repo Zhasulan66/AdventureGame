@@ -1,5 +1,6 @@
 package com.example.analysisgame.presentation.game
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.view.MotionEvent
@@ -8,9 +9,12 @@ import com.example.analysisgame.domain.gamestates.Menu
 import com.example.analysisgame.domain.gamestates.Playing
 
 
-class Game(private val holder: SurfaceHolder) {
+class Game(
+    private val holder: SurfaceHolder,
+    private val context: Context
+) {
     private var menu: Menu = Menu(this)
-    private var playing: Playing = Playing(this)
+    private var playing: Playing = Playing(this, context)
     private val gameLoop = GameLoop(this)
     var currentGameState: GameState = GameState.MENU
 

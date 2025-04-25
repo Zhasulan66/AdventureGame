@@ -7,9 +7,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 
 
-class GamePanel(context: Context?) : SurfaceView(context), SurfaceHolder.Callback {
+class GamePanel(context: Context) : SurfaceView(context), SurfaceHolder.Callback {
 
-    private val game = Game(holder)
+    private val game = Game(holder, context)
 
     init {
         holder.addCallback(this)
