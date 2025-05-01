@@ -30,8 +30,8 @@ class SpriteSheet(
         return bitmap
     }
 
-    fun getSprite(yPos: Int, xPos: Int): Bitmap? {
-        return sprites[yPos][xPos]
+    fun getSprite(yPos: Int, xPos: Int): Bitmap {
+        return sprites[yPos][xPos]!!
     }
 
     fun getScaledBitmap(bitmap: Bitmap): Bitmap {
@@ -48,11 +48,11 @@ class SpriteSheet(
     }
 
     fun getWaterSprite(): Sprite {
-        return getTileByIndex(0, 2)
+        return getTileByIndex(0, 0)
     }
 
     fun getGrassSprite(): Sprite {
-        return getTileByIndex(1, 0)
+        return getTileByIndex(0, 1)
     } // 1 1
 
     fun getGroundSprite(): Sprite {

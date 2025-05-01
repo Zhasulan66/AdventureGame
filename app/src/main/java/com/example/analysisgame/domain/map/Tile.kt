@@ -4,15 +4,24 @@ import android.graphics.Canvas
 import android.graphics.Rect
 import com.example.analysisgame.domain.graphics.SpriteSheet
 import com.example.analysisgame.domain.map.tiles.GrassTile
+import com.example.analysisgame.domain.map.tiles.WaterTile
 
 abstract class Tile(
     private val mapLocation: Rect,
     private var walkable: Boolean
 ) {
 
+    enum class TileType {
+        WATER_TILE,
+        GRASS_TILE
+    }
+
     companion object {
         fun getTile(idxTileType: Int, spriteSheet: SpriteSheet, mapLocationRect: Rect, lvl: Int): Tile{
-            return GrassTile(spriteSheet, mapLocationRect, true)
+            return when(TileType.entries[idxTileType-10]){
+                TileType.WATER_TILE -> WaterTile(spriteSheet, mapLocationRect, false) //10
+                TileType.GRASS_TILE -> GrassTile(spriteSheet, mapLocationRect, true) //11
+            }
         }
     }
 

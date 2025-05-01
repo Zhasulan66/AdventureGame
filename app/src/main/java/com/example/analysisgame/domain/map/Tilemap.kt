@@ -22,7 +22,7 @@ class Tilemap(
 
     val mapLayout = MapLayout(lvl)
     var tilemap: Array<Array<Tile>> = arrayOf()
-        private set //mutableListOf<MutableList<Tile>>()
+        private set
     private var mapBitmap: Bitmap
 
     private val layout = mapLayout.getLayout()
@@ -105,8 +105,8 @@ class Tilemap(
 
     fun getTileRect(tileX: Int, tileY: Int): RectF {
         // Calculate the top-left corner coordinates of the tile
-        val left = (tileX * 64).toFloat()
-        val top = (tileY * 64).toFloat()
+        val left = (tileX * 64).toFloat() //+ 64f
+        val top = (tileY * 64).toFloat() //+ 64f
 
         // Calculate the bottom-right corner coordinates of the tile
         val right = left + 64

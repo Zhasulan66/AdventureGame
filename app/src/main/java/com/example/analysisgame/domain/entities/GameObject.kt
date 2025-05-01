@@ -25,10 +25,13 @@ abstract class GameObject(
 
     abstract fun update()
 
-    fun getDistanceBetweenObjects(obj1: GameObject, obj2: GameObject): Float {
-        return sqrt(
-            (obj2.positionX - obj1.positionX).pow(2) +
-                    (obj2.positionY - obj1.positionY).pow(2)
-        )
+    companion object {
+        fun getDistanceBetweenObjects(obj1: GameObject, obj2: GameObject): Float {
+            return sqrt(
+                (obj2.positionX - obj1.positionX).pow(2) +
+                        (obj2.positionY - obj1.positionY).pow(2)
+            )
+        }
     }
+
 }

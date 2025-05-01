@@ -22,8 +22,7 @@ class HealthBar(
     fun draw(canvas: Canvas, gameDisplay: GameDisplay) {
         val x = player.positionX
         val distanceToPlayer = 100f
-        val healthPointPercentage =
-            player.healthPoints / player.MAX_HEALTH_POINTS
+        val healthPointPercentage = player.healthPoints.toFloat() / player.MAX_HEALTH_POINTS.toFloat()
         val borderTop: Float
 
         // Draw border

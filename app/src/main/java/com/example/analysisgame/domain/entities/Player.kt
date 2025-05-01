@@ -46,19 +46,22 @@ class Player(
         velocityY = (joystick.getActuatorY() * MAX_SPEED).toFloat()
 
         // Update position
-        val newPositionX = (positionX + velocityX)
-        val newPositionY = (positionY + velocityY)
+        val newPositionX = positionX + velocityX
+        val newPositionY = positionY + velocityY
 
         // Check if the new position is within the bounds of the map
-        if (newPositionX - radius >= tilemap.getLeft() && newPositionX + radius <= tilemap.getRight() && newPositionY - radius >= tilemap.getTop() && newPositionY + radius <= tilemap.getBottom() &&
-            canWalkTo(newPositionX, newPositionY)
+        if (newPositionX - radius - 32f >= tilemap.getLeft()
+            && newPositionX + radius + 64f <= tilemap.getRight()
+            && newPositionY - radius - 32f >= tilemap.getTop()
+            && newPositionY + radius + 64f <= tilemap.getBottom()
+            && canWalkTo(newPositionX, newPositionY)
         ) {
-            positionX = newPositionX
-            positionY = newPositionY
-
             // Update previous position
             previousPositionX = positionX
             previousPositionY = positionY
+
+            positionX = newPositionX
+            positionY = newPositionY
 
 
             // Update direction
@@ -73,8 +76,8 @@ class Player(
             animator.updateAnimation(this)
         } else {
             // Player is trying to move outside of the map, so don't update position or direction
-            /*velocityX = 0;
-            velocityY = 0;*/
+            //velocityX = 0f;
+            //velocityY = 0f;
             positionX = previousPositionX
             positionY = previousPositionY
             animator.updateAnimation(this)
