@@ -14,30 +14,31 @@ class Game(
     private val holder: SurfaceHolder,
     private val context: Context
 ) {
-    private var menu: Menu = Menu(this)
-    private var playing: Playing = Playing(this, context)
-    private var dialogScreen: DialogScreen = DialogScreen(this)
-    private val gameLoop = GameLoop(this)
+    private val gameLoop = GameLoop(this, holder)
     var currentGameState: GameState = GameState.MENU
+
+    private var menu: Menu = Menu(this)
+    private var playing: Playing = Playing(this, context, gameLoop)
+    private var dialogScreen: DialogScreen = DialogScreen(this)
 
     var questionNum = 0
     var currentLevel = 1
     var dialogNum = 0
 
 
-    fun update(delta: Double) {
+    fun update() {
         when (currentGameState) {
-            GameState.MENU -> menu.update(delta)
-            GameState.PLAYING -> playing.update(delta)
+            GameState.MENU -> menu.update()
+            GameState.PLAYING -> playing.update()
             GameState.DIALOG -> {
                 initQuestionNum()
-                dialogScreen.update(delta)
+                dialogScreen.update()
             }
         }
     }
 
-    fun render() {
-        val c: Canvas = holder.lockCanvas()
+    fun render(c: Canvas) {
+        //val c: Canvas = holder.lockCanvas()
         //c.drawColor(Color.BLUE)
 
         //Draw the game
@@ -55,7 +56,7 @@ class Game(
             }
         }
 
-        holder.unlockCanvasAndPost(c)
+        //holder.unlockCanvasAndPost(c)
     }
 
     fun touchEvent(event: MotionEvent): Boolean {
@@ -69,7 +70,11 @@ class Game(
     }
 
     fun startGameLoop() {
-        gameLoop.startGameLoop()
+        gameLoop.startLoop()
+    }
+
+    fun pauseGameLoop(){
+        gameLoop.stopLoop()
     }
 
     enum class GameState {

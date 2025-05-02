@@ -3,6 +3,7 @@ package com.example.analysisgame.domain.entities
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import androidx.core.content.ContextCompat
 import com.example.analysisgame.R
 import com.example.analysisgame.presentation.game.GameDisplay
 
@@ -13,16 +14,20 @@ class HealthBar(
     val player: Player
 ) {
 
-    val borderPaint = Paint().apply { color = context.getColor(R.color.healthBarBorder) }
-    val healthPaint = Paint().apply { color = context.getColor(R.color.healthBarHealth) }
-    val width = 100
-    val height = 20
-    val margin = 2
+    private val borderPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.healthBarBorder)
+    }
+    private val healthPaint = Paint().apply {
+        color = ContextCompat.getColor(context, R.color.healthBarHealth)
+    }
+    private val width = 100f
+    private val height = 20f
+    private val margin = 2f
 
     fun draw(canvas: Canvas, gameDisplay: GameDisplay) {
         val x = player.positionX
         val distanceToPlayer = 100f
-        val healthPointPercentage = player.healthPoints.toFloat() / player.MAX_HEALTH_POINTS.toFloat()
+        val healthPointPercentage = player.getHealthPoints().toFloat() / 5f //player max health point = 5
         val borderTop: Float
 
         // Draw border

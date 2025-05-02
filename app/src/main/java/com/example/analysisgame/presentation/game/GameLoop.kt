@@ -1,44 +1,119 @@
 package com.example.analysisgame.presentation.game
 
+import android.graphics.Canvas
+import android.util.Log
+import android.view.SurfaceHolder
+import java.lang.Thread.sleep
+
 class GameLoop(
-    private var game: Game
-) : Runnable {
-    private var gameThread: Thread = Thread(this)
+    val game: Game,
+    val surfaceHolder: SurfaceHolder
+) : Thread() {
+
+    var isRunning = false
+    private var averageUPS = 0.0
+    private var averageFPS = 0.0
 
     companion object {
-        var delta: Double = 0.0
+
+        val MAX_UPS = 30.0
+        val UPS_PERIOD = 1E+3 / MAX_UPS
+
+
+    }
+
+    fun getAverageUPS(): Double {
+        return averageUPS
+    }
+
+    fun getAverageFPS(): Double {
+        return averageFPS
+    }
+
+    fun startLoop() {
+        Log.d("GameLoop.kt", "startLoop()")
+        isRunning = true
+        start()
     }
 
     override fun run() {
+        Log.d("GameLoop.kt", "run()")
+        super.run()
 
-        var lastFPSCheck = System.currentTimeMillis()
-        var fps = 0
+        // Declare time and cycle count variables
+        var updateCount = 0
+        var frameCount = 0
 
-        var lastDelta = System.nanoTime()
-        val nanoSec = 1_000_000_000
+        var startTime: Long
+        var elapsedTime: Long
+        var sleepTime: Long
 
-        while (true){
-            val nowDelta = System.nanoTime()
-            val timeSinceLastDelta = nowDelta - lastDelta
-            delta = timeSinceLastDelta / nanoSec.toDouble()
+        // Game loop
+        var canvas: Canvas? = null
+        startTime = System.currentTimeMillis()
+        while (isRunning) {
+            // Try to update and render game
+            try {
+                canvas = surfaceHolder.lockCanvas()
+                synchronized(surfaceHolder) {
+                    game.update()
+                    updateCount++
+                    game.render(canvas)
+                }
 
-            game.update(delta)
-            game.render()
-            lastDelta = nowDelta
+            } catch (e: IllegalArgumentException) {
+                e.printStackTrace()
+            } finally {
+                if (canvas != null) {
+                    try {
+                        surfaceHolder.unlockCanvasAndPost(canvas)
+                        frameCount++
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
 
-            fps++
+            // Pause game loop to not exceed target UPS
+            elapsedTime = System.currentTimeMillis() - startTime
+            sleepTime = (updateCount * UPS_PERIOD - elapsedTime).toLong()
+            if (sleepTime > 0) {
+                try {
+                    sleep(sleepTime)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+            }
 
-            val now = System.currentTimeMillis()
-            if(now - lastFPSCheck >= 1000){
-                //println("FPS: $fps")
-                fps = 0
-                lastFPSCheck += 1000
+            // Skip frames to keep up with target UPS
+            while (sleepTime < 0 && updateCount < MAX_UPS - 1) {
+                game.update()
+                updateCount++
+                elapsedTime = System.currentTimeMillis() - startTime
+                sleepTime = (updateCount * UPS_PERIOD - elapsedTime).toLong()
+            }
+
+            // Calculate average UPS and FPS
+            elapsedTime = System.currentTimeMillis() - startTime
+            if (elapsedTime >= 1000) {
+                averageUPS = updateCount / (1E-3 * elapsedTime)
+                averageFPS = frameCount / (1E-3 * elapsedTime)
+                updateCount = 0
+                frameCount = 0
+                startTime = System.currentTimeMillis()
             }
         }
     }
 
-    fun startGameLoop(){
-        gameThread.start()
+    fun stopLoop() {
+        Log.d("GameLoop.kt", "stopLoop()")
+        isRunning = false
+        try {
+            join()
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
     }
+
 
 }

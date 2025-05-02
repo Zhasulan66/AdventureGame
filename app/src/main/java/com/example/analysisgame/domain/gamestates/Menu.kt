@@ -7,7 +7,7 @@ import android.view.MotionEvent
 import com.example.analysisgame.presentation.game.Game
 
 
-class Menu(game: Game) : BaseState(game), GameStateInterface {
+class Menu(val game: Game) : BaseState(game), GameStateInterface {
     private val paint: Paint = Paint()
 
     init {
@@ -15,7 +15,7 @@ class Menu(game: Game) : BaseState(game), GameStateInterface {
         paint.setColor(Color.WHITE)
     }
 
-    override fun update(delta: Double) {
+    override fun update() {
     }
 
     override fun render(c: Canvas) {
@@ -23,6 +23,6 @@ class Menu(game: Game) : BaseState(game), GameStateInterface {
     }
 
     override fun touchEvents(event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_DOWN) getGame().currentGameState = Game.GameState.PLAYING
+        if (event.action == MotionEvent.ACTION_DOWN) game.currentGameState = Game.GameState.PLAYING
     }
 }

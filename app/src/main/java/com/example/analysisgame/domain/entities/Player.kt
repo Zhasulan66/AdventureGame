@@ -15,20 +15,22 @@ import com.example.analysisgame.presentation.game.GameLoop
 
 class Player(
     context: Context,
+    gameLoop: GameLoop,
     val joystick: Joystick,
     positionX: Float,
     positionY: Float,
     radius: Float,
     val animator: Animator,
     val tilemap: Tilemap
-
 ) : Circle(context, Color.RED, positionX, positionY, radius)
 {
-    val MAX_HEALTH_POINTS = 5
-    var healthPoints = MAX_HEALTH_POINTS
-    val SPEED_PIXELS_PER_SECOND = 400f
-    var MAX_SPEED = SPEED_PIXELS_PER_SECOND * 0//GameLoop.delta
-    val healthBar = HealthBar(context, this)
+    companion object {
+        val SPEED_PIXELS_PER_SECOND: Double = 400.0
+        val MAX_SPEED: Double = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS
+        const val MAX_HEALTH_POINTS: Int = 5
+    }
+    private var healthPoints = MAX_HEALTH_POINTS
+    private val healthBar = HealthBar(context, this)
 
     var previousPositionX = positionX
     var previousPositionY = positionY
@@ -40,7 +42,7 @@ class Player(
     }
 
     override fun update() {
-        MAX_SPEED = (SPEED_PIXELS_PER_SECOND * GameLoop.delta).toFloat()
+        //MAX_SPEED = (SPEED_PIXELS_PER_SECOND * GameLoop.getAverageUPS()).toFloat()
         // Update velocity based on actuator of joystick
         velocityX = (joystick.getActuatorX() * MAX_SPEED).toFloat()
         velocityY = (joystick.getActuatorY() * MAX_SPEED).toFloat()
@@ -116,6 +118,15 @@ class Player(
         }*/
 
         return index
+    }
+
+    fun getHealthPoints(): Int {
+        return healthPoints
+    }
+
+    fun setHealthPoints(healthPoint: Int){
+        if(healthPoint >= 0)
+            healthPoints = healthPoint
     }
 
 }

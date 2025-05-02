@@ -27,42 +27,25 @@ class Skeleton(
     positionY = positionY,
     radius = 60f
 ) {
-
-   val SPEED_PIXELS_PER_SECOND = 400f * 0.6f //* player.MAX_SPEED
-    var MAX_SPEED = SPEED_PIXELS_PER_SECOND
-     /*val SPAWNS_PER_MINUTE = 20f
-    val SPAWNS_PER_SECOND = SPAWNS_PER_MINUTE / 60f
-    val UPDATES_PER_SPAWN = GameLoop.delta / SPAWNS_PER_SECOND
-    var updatesUntilNextSpawn = UPDATES_PER_SPAWN*/
-
-
     private var skeletonAniIndexY = 0
     private var skeletonFaceDir = Constants.FaceDir.RIGHT
     private var aniTick = 0
     private val aniSpeed = 5
 
-    /*init {
-        MAX_SPEED = (SPEED_PIXELS_PER_SECOND / GameLoop.delta).toFloat()
-    }*/
-
-
     companion object {
-        private const val SPAWNS_PER_MINUTE = 4f
-        private const val SPAWNS_PER_SECOND = SPAWNS_PER_MINUTE / 60f
-        private var UPDATES_PER_SPAWN = GameLoop.delta / SPAWNS_PER_SECOND
-        private var updatesUntilNextSpawn = UPDATES_PER_SPAWN
-
-       /* fun init(gameLoopDelta: Float) {
-            UPDATES_PER_SPAWN = gameLoopDelta / SPAWNS_PER_SECOND
-            updatesUntilNextSpawn = UPDATES_PER_SPAWN
-        }*/
+        private val SPEED_PIXELS_PER_SECOND: Double = Player.SPEED_PIXELS_PER_SECOND * 0.6
+        private val MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS
+        private val SPAWNS_PER_MINUTE = 20.0
+        private val SPAWNS_PER_SECOND = SPAWNS_PER_MINUTE/60
+        private val UPDATES_PER_SPAWN = GameLoop.MAX_UPS/SPAWNS_PER_SECOND
+        private var updatesUnitNextSpawn = UPDATES_PER_SPAWN
 
         fun readyToSpawn(): Boolean {
-            if (updatesUntilNextSpawn <= 0) {
-                updatesUntilNextSpawn += UPDATES_PER_SPAWN
+            if(updatesUnitNextSpawn <= 0){
+                updatesUnitNextSpawn += UPDATES_PER_SPAWN
                 return true
             } else {
-                updatesUntilNextSpawn--
+                updatesUnitNextSpawn--
                 return false
             }
         }
@@ -89,7 +72,7 @@ class Skeleton(
     }
 
     override fun update() {
-        MAX_SPEED = (SPEED_PIXELS_PER_SECOND * GameLoop.delta ).toFloat()
+       // MAX_SPEED = (SPEED_PIXELS_PER_SECOND * GameLoop.getAverageUPS() ).toFloat()
 
         // =========================================================================================
         //   Update velocity of the enemy so that the velocity is in the direction of the player

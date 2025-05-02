@@ -7,8 +7,10 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.GameOver
 import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.NPC_Elder
+import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
@@ -17,12 +19,12 @@ import com.example.analysisgame.domain.graphics.SpriteSheet
 import com.example.analysisgame.domain.map.Tilemap
 import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
+import com.example.analysisgame.presentation.game.GameLoop
 import kotlin.random.Random
 
 
-class Playing(game: Game, val context: Context) : BaseState(game), GameStateInterface {
+class Playing(val game: Game, val context: Context, gameLoop: GameLoop) : BaseState(game), GameStateInterface {
 
-    val myGame = game
     val tilemap = Tilemap(SpriteSheet(context, R.drawable.adv_game_tiles), 1)
 
     private var joystickPointerId = 0
@@ -30,28 +32,33 @@ class Playing(game: Game, val context: Context) : BaseState(game), GameStateInte
     private val animator = Animator(SpriteSheet(context, R.drawable.spritesheet_rogue))//spritesheet_rogue
 
     private val skeletons = ArrayList<Skeleton>()
-
-    private var skeletonAmount = 4
     private val spellList = ArrayList<Spell>()
+
+    private var skeletonAmount = 5
 
     private val npcElder = NPC_Elder(context, 500f, 500f)
     var dialogNum = 0
 
     //For UI
     private val joystick = Joystick(250f, 800f, 150f, 80f)
-    private val player = Player(context, joystick, 1050f, 1170f, 32f, animator, tilemap); // 1080 x 2340
+    private val player = Player(context, gameLoop, joystick, 1050f, 1170f, 32f, animator, tilemap) // 1080 x 2340
     //val skeleton = Skeleton(context, player, 0f, 0f)
     val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
     /*init {
         Skeleton.init(GameLoop.delta.toFloat())
     }*/
+    val gameOver = GameOver(context)
+    val performance = Performance(context, gameLoop)
 
-    override fun update(delta: Double) {
-        if(player.healthPoints <= 0) return
+    override fun update() {
+        // Stop updating the game if the player is dead
+        if (player.getHealthPoints() <= 0) {
+            return
+        }
 
-        if(player.healthPoints == 1 && dialogNum == 0){
-            myGame.currentGameState = Game.GameState.DIALOG
+        if(player.getHealthPoints() == 1 && dialogNum == 0){
+            game.currentGameState = Game.GameState.DIALOG
             dialogNum = 1
         }
 
@@ -77,7 +84,7 @@ class Playing(game: Game, val context: Context) : BaseState(game), GameStateInte
             val skeleton = iteratorSkeleton.next()
             if(Circle.isColliding(skeleton, player)){
                 iteratorSkeleton.remove()
-                player.healthPoints -= 1
+                player.setHealthPoints(player.getHealthPoints()-1)
                 continue
             }
 
@@ -119,8 +126,15 @@ class Playing(game: Game, val context: Context) : BaseState(game), GameStateInte
         for (spell in spellList) {
             spell.draw(c, gameDisplay)
         }
-        if(myGame.currentGameState != Game.GameState.DIALOG){
+        if(game.currentGameState != Game.GameState.DIALOG){
             joystick.draw(c)
+        }
+
+        performance.draw(c)
+
+        // Draw Game over if the player is dead
+        if (player.getHealthPoints() <= 0) {
+            gameOver.draw(c)
         }
 
 

@@ -7,7 +7,7 @@ import android.graphics.RectF
 import android.view.MotionEvent
 import com.example.analysisgame.presentation.game.Game
 
-class DialogScreen(game: Game) : BaseState(game), GameStateInterface {
+class DialogScreen(val game: Game) : BaseState(game), GameStateInterface {
     val alpha1 = Color.argb(120, 0, 0, 0)
     val paint_blackFill = Paint().apply {
         style = Paint.Style.FILL
@@ -58,7 +58,7 @@ class DialogScreen(game: Game) : BaseState(game), GameStateInterface {
     }
 
 
-    override fun update(delta: Double) {
+    override fun update() {
         question = questionList[question_num]
         ans1 = answerList[question_num][0]
         ans2 = answerList[question_num][1]
@@ -107,7 +107,7 @@ class DialogScreen(game: Game) : BaseState(game), GameStateInterface {
     }
 
     override fun touchEvents(event: MotionEvent) {
-        when (getGame().currentLevel) {
+        when (game.currentLevel) {
             1 -> sendAnswer(event, Game.GameState.PLAYING)
         }
     }
@@ -181,19 +181,19 @@ class DialogScreen(game: Game) : BaseState(game), GameStateInterface {
         if (event.action == MotionEvent.ACTION_MOVE) {
             if (rectOp1.contains(event.x, event.y)) {
                 println(question + " answer is: " + answerList[question_num][0]);
-                getGame().currentGameState = (gameState);
+                game.currentGameState = (gameState);
             }
             if (rectOp2.contains(event.x, event.y)) {
                 println(question + "answer is: " + answerList[question_num][1]);
-                getGame().currentGameState = (gameState);
+                game.currentGameState = (gameState);
             }
             if (rectOp3.contains(event.x, event.y)) {
                 println(question + "answer is: " + answerList[question_num][2]);
-                getGame().currentGameState = (gameState);
+                game.currentGameState = (gameState);
             }
             if (rectOp4.contains(event.x, event.y)) {
                 println(question + "answer is: " + answerList[question_num][3]);
-                getGame().currentGameState = (gameState);
+                game.currentGameState = (gameState);
             }
         }
     }
