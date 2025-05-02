@@ -14,11 +14,24 @@ class Tilemap(
 ) {
     val TILE_WIDTH_PIXELS: Int = 64 //64
     val TILE_HEIGHT_PIXELS: Int = 64 //64
-    val NUMBER_OF_ROW_TILES: Int = 20 //34
-    val NUMBER_OF_COLUMN_TILES: Int = 40 //48
+    val NUMBER_OF_ROW_TILES: Int =
+        when(lvl){
+            1 -> 20
+            2 -> 24
+            3 -> 20
+            4 -> 20
+            else -> {20}
+        }
+    val NUMBER_OF_COLUMN_TILES: Int = when(lvl){
+        1 -> 43
+        2 -> 54
+        3 -> 54
+        4 -> 54
+        else -> {54}
+    }
 
-    var mapWidth: Int = TILE_WIDTH_PIXELS * 40 //40 48
-    var mapHeight: Int = TILE_HEIGHT_PIXELS * 20 //40 34
+    var mapWidth: Int = TILE_WIDTH_PIXELS * NUMBER_OF_COLUMN_TILES //40 48
+    var mapHeight: Int = TILE_HEIGHT_PIXELS * NUMBER_OF_ROW_TILES //40 34
 
     val mapLayout = MapLayout(lvl)
     var tilemap: Array<Array<Tile>> = arrayOf()
@@ -30,12 +43,10 @@ class Tilemap(
     init {
         tilemap = Array(NUMBER_OF_ROW_TILES) { row ->
             Array(NUMBER_OF_COLUMN_TILES) { col ->
-                Tile.getTile(
+                TileFactory.createTile(
                     layout[row][col],
                     spriteSheet,
-                    getRectByIndex(row, col),
-                    lvl
-                )
+                    getRectByIndex(row, col))
             }
         }
 

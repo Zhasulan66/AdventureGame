@@ -14,10 +14,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun GameScreen(
     navController: NavController,
-    context: Context
+    context: Context,
+    level: Int
 ){
 
-    val gamePanel = GamePanel(context)
+    val gamePanel = GamePanel(context, level)
     /*Box(
         modifier = Modifier
             .fillMaxSize()

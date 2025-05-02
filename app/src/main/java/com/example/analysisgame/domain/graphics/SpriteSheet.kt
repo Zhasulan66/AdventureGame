@@ -47,87 +47,6 @@ class SpriteSheet(
         return spriteArray
     }
 
-    fun getWaterSprite(): Sprite {
-        return getTileByIndex(0, 0)
-    }
-
-    fun getGrassSprite(): Sprite {
-        return getTileByIndex(0, 1)
-    } // 1 1
-
-    fun getGroundSprite(): Sprite {
-        return getTileByIndex(1, 1)
-    } // 1 2
-
-    fun getGrassBigSprite(): Sprite {
-        return getTileByIndex(0, 1)
-    }
-
-    fun getTreeSprite(): Sprite {
-        return getTileByIndex(1, 2)
-    }
-
-    fun getBigTreeSprite(): Sprite {
-        return getTileByIndex(2, 0)
-    }
-
-    fun getBigTree2Sprite(): Sprite {
-        return getTileByIndex(2, 1)
-    }
-
-    fun getBigTree3Sprite(): Sprite {
-        return getTileByIndex(3, 0)
-    }
-
-    fun getBigTree4Sprite(): Sprite {
-        return getTileByIndex(3, 1)
-    }
-
-    fun getSnowSprite(): Sprite {
-        return getTileByIndex(1, 3)
-    } // 1 3
-
-    fun getDesertSprite(): Sprite {
-        return getTileByIndex(0, 4)
-    } // 0 4
-
-    fun getTreeSnowSprite(): Sprite {
-        return getTileByIndex(2, 2)
-    }
-
-    fun getTreeSnow2Sprite(): Sprite {
-        return getTileByIndex(2, 3)
-    }
-
-    fun getTreeSnow3Sprite(): Sprite {
-        return getTileByIndex(3, 2)
-    }
-
-    fun getTreeSnow4Sprite(): Sprite {
-        return getTileByIndex(3, 3)
-    }
-
-    fun getSandSprite(): Sprite {
-        return getTileByIndex(1, 4)
-    }
-
-    fun getStone1Sprite(): Sprite {
-        return getTileByIndex(2, 4)
-    }
-
-    fun getStone2Sprite(): Sprite {
-        return getTileByIndex(2, 5)
-    }
-
-    fun getStone3Sprite(): Sprite {
-        return getTileByIndex(3, 4)
-    }
-
-    fun getStone4Sprite(): Sprite {
-        return getTileByIndex(3, 5)
-    }
-
-
     private fun getSpriteByIndex(idxRow: Int, idxCol: Int): Sprite {
         return Sprite(
             this, Rect(
@@ -139,7 +58,7 @@ class SpriteSheet(
         )
     }
 
-    private fun getTileByIndex(idxRow: Int, idxCol: Int): Sprite {
+    fun getTileByIndex(idxRow: Int, idxCol: Int): Sprite {
         return Sprite(
             this, Rect(
                 idxCol * 16,
@@ -149,4 +68,10 @@ class SpriteSheet(
             )
         )
     }
+
+    fun getWaterSprite(): Sprite {
+        return getTileByIndex(0, 0)
+    }
+
+
 }

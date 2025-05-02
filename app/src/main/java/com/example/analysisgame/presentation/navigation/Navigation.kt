@@ -10,9 +10,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.analysisgame.presentation.LanguageManager
 import com.example.analysisgame.presentation.screens.GameScreen
 import com.example.analysisgame.presentation.screens.HomeScreen
@@ -70,10 +72,18 @@ fun Navigation(
         }
 
         //HomeScreen
-        composable(route = Screen.GameScreen.route) {
+        composable(route = Screen.GameScreen.route + "/{level}",
+            arguments = listOf(
+                navArgument("level"){
+                    type = NavType.IntType
+                    defaultValue = 1
+                    nullable = false
+                }
+            )){ entry ->
             GameScreen(
                 navController = navController,
-                context = context
+                context = context,
+                level = entry.arguments!!.getInt("level")
             )
         }
     }
