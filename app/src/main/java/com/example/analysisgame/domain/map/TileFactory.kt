@@ -34,6 +34,8 @@ object TileFactory {
             33 -> TileData(Tile.TileType.GRASS_TILE, true) { it.getTileByIndex(1, 0) } //snow
             34 -> TileData(Tile.TileType.GRASS_TILE, true) { it.getTileByIndex(1, 1) } //desert
             35 -> TileData(Tile.TileType.GRASS_TILE, true) { it.getTileByIndex(1, 2) } //room
+            36 -> TileData(Tile.TileType.GRASS_TILE, true) { it.getTileByIndex(1, 3) } //road1
+            37 -> TileData(Tile.TileType.GRASS_TILE, true) { it.getTileByIndex(1, 4) } //road2
             else -> throw IllegalArgumentException("Unknown tile ID: $tileId")
         }
     }

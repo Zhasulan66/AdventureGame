@@ -29,14 +29,14 @@ class Playing2(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
 
     private var joystickPointerId = 0
 
-    private val animator = Animator(SpriteSheet(context, R.drawable.spritesheet_skeleton))//spritesheet_rogue
+    private val animator = Animator(SpriteSheet(context, R.drawable.spritesheet_rogue))//spritesheet_rogue
 
     private val skeletons = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
 
-    private var skeletonAmount = 0
+    private var skeletonAmount = 1
 
-    private val npcElder = NPC_Elder(context, 500f, 500f)
+    private val npcElder = NPC_Elder(context, 2200f, 1000f)
     var dialogNum = 0
 
     //For UI
@@ -57,7 +57,7 @@ class Playing2(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
             return
         }
 
-        if(player.getHealthPoints() == 1 && dialogNum == 0){
+        if(player.getHealthPoints() == 4 && dialogNum == 0){
             game.currentGameState = Game.GameState.DIALOG
             dialogNum = 1
         }
@@ -114,7 +114,7 @@ class Playing2(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
 
         player.draw(c, gameDisplay)
 
-        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_rogue))
+        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_elder))
 
         for(skeleton in skeletons)
             skeleton.draw(

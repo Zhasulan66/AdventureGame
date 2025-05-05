@@ -32,6 +32,7 @@ class Game(
 
 
     var questionNum = 0
+
     //var currentLevel = 1
     var dialogNum = 0
 
@@ -62,24 +63,29 @@ class Game(
                 c.drawColor(Color.BLUE)
                 playing.render(c)
             }
+
             GameState.PLAYING2 -> {
                 c.drawColor(Color.BLACK)
                 playing2.render(c)
             }
+
             GameState.PLAYING3 -> {
                 c.drawColor(Color.BLACK)
                 playing3.render(c)
             }
+
             GameState.PLAYING4 -> {
                 c.drawColor(Color.BLACK)
                 playing4.render(c)
             }
+
             GameState.PLAYING5 -> {
                 c.drawColor(Color.BLACK)
                 playing5.render(c)
             }
+
             GameState.DIALOG -> {
-                when(currentLevel){
+                when (currentLevel) {
                     1 -> playing.render(c)
                 }
                 dialogScreen.render(c)
@@ -107,7 +113,7 @@ class Game(
         gameLoop.startLoop()
     }
 
-    fun pauseGameLoop(){
+    fun pauseGameLoop() {
         gameLoop.stopLoop()
     }
 
@@ -115,13 +121,48 @@ class Game(
         MENU, DIALOG, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5
     }
 
-    private fun initQuestionNum(){
-        when(currentLevel){
+    private fun initQuestionNum() {
+        when (currentLevel) {
             1 -> {
-                if(dialogNum == 0)
-                    dialogScreen.question_num = 0
-                if(dialogNum == 1)
-                    dialogScreen.question_num = 1
+                if (dialogNum == 0)
+                    dialogScreen.setQuestion_num(0)
+                if (dialogNum == 1)
+                    dialogScreen.setQuestion_num(1)
+            }
+
+            2 -> {
+                if (dialogNum == 0) {
+                    dialogScreen.setQuestion_num(2);
+                }
+                if (dialogNum == 1) {
+                    dialogScreen.setQuestion_num(3);
+                }
+
+            }
+
+            3 -> {
+                if (dialogNum == 0) {
+                    dialogScreen.setQuestion_num(4);
+                }
+                if (dialogNum == 1) {
+                    dialogScreen.setQuestion_num(5);
+                }
+
+            }
+
+            4 -> {
+                if (dialogNum == 0) {
+                    dialogScreen.setQuestion_num(6);
+                }
+                if (dialogNum == 1) {
+                    dialogScreen.setQuestion_num(7);
+                }
+
+            }
+
+            5 -> {
+                dialogScreen.setQuestion_num(8);
+
             }
         }
     }

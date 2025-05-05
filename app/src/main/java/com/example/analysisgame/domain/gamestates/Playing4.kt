@@ -36,7 +36,7 @@ class Playing4(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
 
     private var skeletonAmount = 0
 
-    private val npcElder = NPC_Elder(context, 500f, 500f)
+    private val npcElder = NPC_Elder(context, 2000f, 100f)
     var dialogNum = 0
 
     //For UI
@@ -114,7 +114,7 @@ class Playing4(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
 
         player.draw(c, gameDisplay)
 
-        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_rogue))
+        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_elder))
 
         for(skeleton in skeletons)
             skeleton.draw(

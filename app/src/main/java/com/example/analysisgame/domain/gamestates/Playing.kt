@@ -36,7 +36,7 @@ class Playing(val game: Game, val context: Context, gameLoop: GameLoop) : BaseSt
 
     private var skeletonAmount = 5
 
-    private val npcElder = NPC_Elder(context, 500f, 500f)
+    private val npcElder = NPC_Elder(context, 100f, 50f)
     var dialogNum = 0
 
     //For UI
@@ -61,6 +61,11 @@ class Playing(val game: Game, val context: Context, gameLoop: GameLoop) : BaseSt
             game.currentGameState = Game.GameState.DIALOG
             dialogNum = 1
         }
+
+        /*if(Circle.isColliding(npcElder, player)){
+            game.currentGameState = Game.GameState.DIALOG
+            //dialogNum = 1
+        }*/
 
         joystick.update()
         player.update()
@@ -114,7 +119,7 @@ class Playing(val game: Game, val context: Context, gameLoop: GameLoop) : BaseSt
 
         player.draw(c, gameDisplay)
 
-        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_rogue))
+        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_elder))
 
         for(skeleton in skeletons)
             skeleton.draw(
