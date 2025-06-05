@@ -6,23 +6,16 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 abstract class GameObject(
-    positionX: Float,
-    positionY: Float
+    var positionX: Float,
+    var positionY: Float
 ) {
-    var positionX = 0f
-    var positionY = 0f
-    var velocityX = 0f
-    var velocityY = 0f
-    var directionX = 1f
-    var directionY = 0f
 
-     init {
-        this.positionX = positionX
-        this.positionY = positionY
-    }
+    var velocityX: Float = 0f
+    var velocityY: Float = 0f
+    var directionX: Float = 1f
+    var directionY: Float = 0f
 
     abstract fun draw(canvas: Canvas, gameDisplay: GameDisplay)
-
     abstract fun update()
 
     companion object {
@@ -33,5 +26,4 @@ abstract class GameObject(
             )
         }
     }
-
 }

@@ -7,28 +7,36 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class Joystick(
-    centerPositionX: Float,
-    centerPositionY: Float,
-    private var outerCircleRadius: Float,
-    private var innerCircleRadius: Float
+    private val outerCircleCenterPositionX: Float,
+    private val outerCircleCenterPositionY: Float,
+    private val outerCircleRadius: Float,
+    private val innerCircleRadius: Float
 ) {
+    private var innerCircleCenterPositionX: Float
+    private var innerCircleCenterPositionY: Float
 
-    private var outerCircleCenterPositionX = centerPositionX
-    private var outerCircleCenterPositionY = centerPositionY
-    private var innerCircleCenterPositionX = centerPositionX
-    private var innerCircleCenterPositionY = centerPositionY
 
-    private var innerCirclePaint = Paint()
-        .apply { color = Color.BLUE
-            style = Paint.Style.FILL_AND_STROKE }
-    private var outerCirclePaint = Paint().apply { color = Color.GRAY
-        style = Paint.Style.FILL_AND_STROKE }
+    private val innerCirclePaint = Paint().apply {
+        color = Color.BLUE
+        style = Paint.Style.FILL_AND_STROKE
+    }
+    private val outerCirclePaint = Paint().apply {
+        color = Color.GRAY
+        style = Paint.Style.FILL_AND_STROKE
+    }
+    var isPressed: Boolean = false
+    private var joystickCenterToTouchDistance = 0f
+    var actuatorX: Float = 0f
+        private set
+    var actuatorY: Float = 0f
+        private set
 
-    private var isPressed = false
-    private var joystickCenterToTouchDistance = 0.0
-    private var actuatorX = 0.0
-    private var actuatorY = 0.0
+    init {
+        // Outer and inner circle make up the joystick
+        innerCircleCenterPositionX = outerCircleCenterPositionX
+        innerCircleCenterPositionY = outerCircleCenterPositionY
 
+    }
 
     fun draw(canvas: Canvas) {
         // Draw outer circle
@@ -54,15 +62,15 @@ class Joystick(
 
     private fun updateInnerCirclePosition() {
         innerCircleCenterPositionX =
-            (outerCircleCenterPositionX + actuatorX * outerCircleRadius).toFloat()
+            (outerCircleCenterPositionX + actuatorX * outerCircleRadius)
         innerCircleCenterPositionY =
-            (outerCircleCenterPositionY + actuatorY * outerCircleRadius).toFloat()
+            (outerCircleCenterPositionY + actuatorY * outerCircleRadius)
     }
 
-    fun setActuator(touchPositionX: Double, touchPositionY: Double) {
+    fun setActuator(touchPositionX: Float, touchPositionY: Float) {
         val deltaX = touchPositionX - outerCircleCenterPositionX
         val deltaY = touchPositionY - outerCircleCenterPositionY
-        val deltaDistance = sqrt(deltaX.pow(2.0) + deltaY.pow(2.0))
+        val deltaDistance = sqrt(deltaX.pow(2) + deltaY.pow(2))
 
         if (deltaDistance < outerCircleRadius) {
             actuatorX = deltaX / outerCircleRadius
@@ -75,31 +83,14 @@ class Joystick(
 
     fun isPressed(touchPositionX: Float, touchPositionY: Float): Boolean {
         joystickCenterToTouchDistance = sqrt(
-
-            (outerCircleCenterPositionX - touchPositionX).toDouble().pow(2)
-                    + (outerCircleCenterPositionY - touchPositionY).toDouble().pow(2
-        ))
+            (outerCircleCenterPositionX - touchPositionX).pow(2) +
+                    (outerCircleCenterPositionY - touchPositionY).pow(2)
+        )
         return joystickCenterToTouchDistance < outerCircleRadius
     }
 
-    fun getIsPressed(): Boolean {
-        return isPressed
-    }
-
-    fun setIsPressed(isPressed: Boolean) {
-        this.isPressed = isPressed
-    }
-
-    fun getActuatorX(): Double {
-        return actuatorX
-    }
-
-    fun getActuatorY(): Double {
-        return actuatorY
-    }
-
     fun resetActuator() {
-        actuatorX = 0.0
-        actuatorY = 0.0
+        actuatorX = 0f
+        actuatorY = 0f
     }
 }

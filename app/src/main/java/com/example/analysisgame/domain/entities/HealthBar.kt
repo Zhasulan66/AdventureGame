@@ -13,28 +13,28 @@ class HealthBar(
     context: Context,
     val player: Player
 ) {
-
     private val borderPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.healthBarBorder)
     }
     private val healthPaint = Paint().apply {
         color = ContextCompat.getColor(context, R.color.healthBarHealth)
     }
+
     private val width = 100f
     private val height = 20f
     private val margin = 2f
 
     fun draw(canvas: Canvas, gameDisplay: GameDisplay) {
         val x = player.positionX
-        val distanceToPlayer = 100f
-        val healthPointPercentage = player.getHealthPoints().toFloat() / 5f //player max health point = 5
-        val borderTop: Float
+        val y = player.positionY
+        val distanceToPlayer = 50f
+        var healthPointPercentage = player.getHealthPoints() / 5f
 
-        // Draw border
+        //draw border
         val borderLeft = x - width / 2
         val borderRight = x + width / 2
-        val borderBottom = player.positionY - distanceToPlayer
-        borderTop = borderBottom - height
+        val borderBottom = y - distanceToPlayer
+        val borderTop = borderBottom - height
         canvas.drawRect(
             gameDisplay.gameToDisplayCoordinatesX(borderLeft),
             gameDisplay.gameToDisplayCoordinatesY(borderTop),
@@ -42,16 +42,14 @@ class HealthBar(
             gameDisplay.gameToDisplayCoordinatesY(borderBottom),
             borderPaint
         )
-        val healthTop: Float
-        val healthRight: Float
-        val healthWidth = (width - 2 * margin).toFloat()
-        val healthHeight = (height - 2 * margin).toFloat()
 
-        // Draw health
+        //draw healthBar
+        val healthWidth = width - 2 * margin
+        val healthHeight = height - 2 * margin
         val healthLeft = borderLeft + margin
-        healthRight = healthLeft + healthWidth * healthPointPercentage
+        val healthRight = healthLeft + healthWidth * healthPointPercentage
         val healthBottom = borderBottom - margin
-        healthTop = healthBottom - healthHeight
+        val healthTop = healthBottom - healthHeight
         canvas.drawRect(
             gameDisplay.gameToDisplayCoordinatesX(healthLeft),
             gameDisplay.gameToDisplayCoordinatesY(healthTop),

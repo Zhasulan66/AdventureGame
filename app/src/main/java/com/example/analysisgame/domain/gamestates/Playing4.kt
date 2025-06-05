@@ -1,8 +1,14 @@
 package com.example.analysisgame.domain.gamestates
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Color
+import android.util.Log
 import android.view.MotionEvent
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
@@ -15,83 +21,165 @@ import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.graphics.Animator
-import com.example.analysisgame.domain.graphics.SpriteSheet
-import com.example.analysisgame.domain.map.Tilemap
+import com.example.analysisgame.domain.map.drawTiledLayer
+import com.example.analysisgame.domain.map.loadTiledMap
+import com.example.analysisgame.domain.map.parseLayers
 import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import kotlin.random.Random
 
 
-class Playing4(val game: Game, val context: Context, gameLoop: GameLoop) : BaseState(game), GameStateInterface {
+class Playing4(
+    val game: Game,
+    val context: Context,
+    val gameLoop: GameLoop
+) : BaseState(game), GameStateInterface {
 
-    val tilemap = Tilemap(SpriteSheet(context, R.drawable.adv_game_tiles), 4)
+    private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
 
+    private val joystick = Joystick(275f, 700f, 140f, 80f)
+
+    private val tileset: Bitmap = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.adv_game_tiles4,
+        bitmapOptions
+    )
+    val forth_level_json = loadTiledMap(context, "forth_level.json")
+    val forth_level_layer = parseLayers(forth_level_json)
+
+    private val bitmap: Bitmap = BitmapFactory.decodeResource(
+        context.resources,
+        R.drawable.spritesheet_rogue,
+        bitmapOptions
+    )
+    private val animator = Animator(bitmap)//spriteArray  spriteSheet
+    private val player =
+        Player(context, joystick, 200f, 600f, 32f, animator, forth_level_layer[2])//1000f, 500f
+
+    private val skeletonList = ArrayList<Skeleton>()
+    private val spellList = ArrayList<Spell>()
+    private val npc = NPC_Elder(
+        context = context,
+        imageResId = R.drawable.npc_img,
+        positionX = 2200f,
+        positionY = 2200f,
+        player
+    )
+    val dialogueManager = DialogueManager()
+
+    private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val animator = Animator(SpriteSheet(context, R.drawable.spritesheet_rogue))//spritesheet_rogue
+    private val gameOver = GameOver(context)
+    private val performance = Performance(context, gameLoop)
+    private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
-    private val skeletons = ArrayList<Skeleton>()
-    private val spellList = ArrayList<Spell>()
 
-    private var skeletonAmount = 0
+    override fun render(canvas: Canvas) {
+        //super.draw(canvas)
+        canvas.drawColor(Color.parseColor("#dfe3ed"))
 
-    private val npcElder = NPC_Elder(context, 2000f, 100f)
-    var dialogNum = 0
+        drawTiledLayer(
+            canvas,
+            tileset,
+            forth_level_layer[0],
+            tilesetColumns = 62,
+            gameDisplay = gameDisplay
+        )
 
-    //For UI
-    private val joystick = Joystick(250f, 800f, 150f, 80f)
-    private val player = Player(context, gameLoop, joystick, 1050f, 1170f, 32f, animator, tilemap) // 1080 x 2340
-    //val skeleton = Skeleton(context, player, 0f, 0f)
-    val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
+        drawTiledLayer(
+            canvas,
+            tileset,
+            forth_level_layer[1],
+            tilesetColumns = 62,
+            gameDisplay = gameDisplay
+        )
 
-    /*init {
-        Skeleton.init(GameLoop.delta.toFloat())
-    }*/
-    val gameOver = GameOver(context)
-    val performance = Performance(context, gameLoop)
+        // Draw game objects
+        player.draw(canvas, gameDisplay)
+
+        for (skeleton in skeletonList)
+            skeleton.draw(canvas, gameDisplay)
+
+        for (spell in spellList)
+            spell.draw(canvas, gameDisplay)
+
+        npc.draw(canvas, gameDisplay)
+
+        // Draw game panels
+        joystick.draw(canvas)
+        performance.draw(canvas)
+
+        // Draw Game over if the player is dead
+        if (player.getHealthPoints() <= 0) {
+            gameOver.draw(canvas)
+        }
+
+        dialogueManager.draw(canvas)
+    }
 
     override fun update() {
+
         // Stop updating the game if the player is dead
         if (player.getHealthPoints() <= 0) {
             return
         }
 
-        if(player.getHealthPoints() == 1 && dialogNum == 0){
-            game.currentGameState = Game.GameState.DIALOG
-            dialogNum = 1
-        }
-
         joystick.update()
         player.update()
 
-        if(Skeleton.readyToSpawn() && skeletonAmount > 0){
-            skeletons.add(Skeleton(context, player, Random.nextFloat() * 1000, Random.nextFloat() * 500))
-            skeletonAmount--
+        if (npc.isPlayerNearby(player)
+            && !dialogueManager.isDialogueActive
+            && !npc.hasTalked
+        ) {
+            dialogueManager.startDialogue(npc.getDialogueLines())
+            npc.talkCount++
+            npc.hasTalked = true
         }
 
-        for (skeleton in skeletons){
+        // Reset the flag when player walks away
+        if (!npc.isPlayerNearby(player)) {
+            npc.hasTalked = false
+        }
+        //if(Skeleton.readyToSpawn())
+        //    skeletonList.add(Skeleton(context, player))
+
+        for (skeleton in skeletonList)
             skeleton.update()
-            skeleton.updateAnimation()
+
+        // Update states of all spells
+        while (numberOfSpellToCast > 0) {
+            spellList.add(Spell(context, player))
+            println("spell amount ${spellList.size}")
+            numberOfSpellToCast--
         }
 
-        for (spell in spellList){
+        val spellIterator = spellList.iterator()
+        while (spellIterator.hasNext()) {
+            val spell = spellIterator.next()
             spell.update()
+
+            // Remove spell if it goes outside game boundaries
+            if (spell.positionX < 0 || spell.positionX > 4000f ||
+                spell.positionY < 0 || spell.positionY > 4000f
+            ) {
+                spellIterator.remove()
+            }
         }
 
-        val iteratorSkeleton = skeletons.iterator()
-        while (iteratorSkeleton.hasNext()){
+        val iteratorSkeleton = skeletonList.iterator()
+        while (iteratorSkeleton.hasNext()) {
             val skeleton = iteratorSkeleton.next()
-            if(Circle.isColliding(skeleton, player)){
+            if (Circle.isColliding(skeleton, player)) {
                 iteratorSkeleton.remove()
-                player.setHealthPoints(player.getHealthPoints()-1)
+                player.setHealthPoints((player.getHealthPoints() - 1))
                 continue
             }
 
             val iteratorSpell = spellList.iterator()
             while (iteratorSpell.hasNext()) {
-                val spell: Circle = iteratorSpell.next()
-                // Remove enemy if it collides with a spell
+                val spell = iteratorSpell.next()
                 if (Circle.isColliding(spell, skeleton)) {
                     iteratorSpell.remove()
                     iteratorSkeleton.remove()
@@ -100,76 +188,50 @@ class Playing4(val game: Game, val context: Context, gameLoop: GameLoop) : BaseS
             }
         }
 
-
+        // Update gameDisplay so that it's center is set to the new center of the player's
+        // game coordinates
         gameDisplay.update()
-
-        //skeleton.update()
-        //skeleton.updateAnimation()
-
-    }
-
-    override fun render(c: Canvas) {
-
-        tilemap.draw(c, gameDisplay)
-
-        player.draw(c, gameDisplay)
-
-        npcElder.draw(c, gameDisplay, SpriteSheet(context, R.drawable.spritesheet_elder))
-
-        for(skeleton in skeletons)
-            skeleton.draw(
-                c,
-                gameDisplay,
-                SpriteSheet(context, R.drawable.spritesheet_skeleton)
-            )
-
-        for (spell in spellList) {
-            spell.draw(c, gameDisplay)
-        }
-        if(game.currentGameState != Game.GameState.DIALOG){
-            joystick.draw(c)
-        }
-
-        performance.draw(c)
-
-        // Draw Game over if the player is dead
-        if (player.getHealthPoints() <= 0) {
-            gameOver.draw(c)
-        }
-
-
     }
 
     override fun touchEvents(event: MotionEvent) {
+
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                if(joystick.getIsPressed()){
-                    // Joystick was pressed before this event -> cast spell
-                    spellList.add(Spell(context, player))
-                }else if (joystick.isPressed(event.x, event.y)) {
-                    // Joystick is pressed in this event -> setIsPressed(true) and store pointer id
-                    joystickPointerId = event.getPointerId(event.actionIndex);
-                    joystick.setIsPressed(true)
+            MotionEvent.ACTION_DOWN,
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                dialogueManager.handleTouch(event.x, event.y)
+
+                if (joystick.isPressed) {
+                    numberOfSpellToCast++
+                } else if (joystick.isPressed(event.x, event.y)) {
+                    joystickPointerId = event.getPointerId(event.actionIndex)
+                    joystick.isPressed = true
+                } else {
+                    numberOfSpellToCast++
                 }
-                else {
-                    spellList.add(Spell(context, player))
-                }
-                //else getGame().currentGameState = Game.GameState.MENU
             }
 
             MotionEvent.ACTION_MOVE -> {
-
-                if (joystick.getIsPressed()) {
-                    joystick.setActuator(event.x.toDouble(), event.y.toDouble())
+                if (joystick.isPressed) {
+                    joystick.setActuator(event.x, event.y)
                 }
             }
 
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
-                if(joystickPointerId == event.getPointerId(event.actionIndex)){
-                    joystick.setIsPressed(false)
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_POINTER_UP -> {
+                if (joystickPointerId == event.getPointerId(event.actionIndex)) {
+                    joystick.isPressed = false
                     joystick.resetActuator()
                 }
             }
+
+            else -> {}
         }
+
+    }
+
+    fun pause() {
+        gameLoop.stopLoop()
     }
 }
+
+

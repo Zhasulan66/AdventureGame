@@ -13,6 +13,11 @@ import com.example.analysisgame.domain.gamestates.Playing3
 import com.example.analysisgame.domain.gamestates.Playing4
 import com.example.analysisgame.domain.gamestates.Playing5
 
+/*import com.example.analysisgame.domain.gamestates.Playing2
+import com.example.analysisgame.domain.gamestates.Playing3
+import com.example.analysisgame.domain.gamestates.Playing4
+import com.example.analysisgame.domain.gamestates.Playing5*/
+
 
 class Game(
     private val holder: SurfaceHolder,
@@ -46,7 +51,7 @@ class Game(
             GameState.PLAYING4 -> playing4.update()
             GameState.PLAYING5 -> playing5.update()
             GameState.DIALOG -> {
-                initQuestionNum()
+                //initQuestionNum()
                 dialogScreen.update()
             }
         }
@@ -60,33 +65,29 @@ class Game(
         when (currentGameState) {
             GameState.MENU -> menu.render(c)
             GameState.PLAYING -> {
-                c.drawColor(Color.BLUE)
                 playing.render(c)
             }
 
             GameState.PLAYING2 -> {
-                c.drawColor(Color.BLACK)
                 playing2.render(c)
             }
 
             GameState.PLAYING3 -> {
-                c.drawColor(Color.BLACK)
                 playing3.render(c)
             }
 
             GameState.PLAYING4 -> {
-                c.drawColor(Color.BLACK)
                 playing4.render(c)
             }
 
             GameState.PLAYING5 -> {
-                c.drawColor(Color.BLACK)
                 playing5.render(c)
             }
 
             GameState.DIALOG -> {
                 when (currentLevel) {
                     1 -> playing.render(c)
+                    //add text levels
                 }
                 dialogScreen.render(c)
             }
@@ -121,7 +122,7 @@ class Game(
         MENU, DIALOG, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5
     }
 
-    private fun initQuestionNum() {
+    /*private fun initQuestionNum() {
         when (currentLevel) {
             1 -> {
                 if (dialogNum == 0)
@@ -165,5 +166,5 @@ class Game(
 
             }
         }
-    }
+    }*/
 }
