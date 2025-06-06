@@ -18,7 +18,7 @@ fun GameScreen(
     level: Int
 ){
 
-    val gamePanel = GamePanel(context, level)
+    val gamePanel = GamePanel(context, level, navController)
     /*Box(
         modifier = Modifier
             .fillMaxSize()

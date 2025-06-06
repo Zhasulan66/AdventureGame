@@ -26,19 +26,19 @@ object SoundEffectsManager {
     }
 
     fun playFireball() {
-        if (loaded) {
+        if (loaded && SettingsManager.isSoundOn) {
             soundPool?.play(fireballSoundId, 1f, 1f, 1, 0, 1f)
         }
     }
 
     fun playDamage() {
-        if (loaded) {
+        if (loaded && SettingsManager.isSoundOn) {
             soundPool?.play(damageSoundId, 1f, 1f, 1, 0, 1f)
         }
     }
 
     fun playGameOver() {
-        if (loaded) {
+        if (loaded && SettingsManager.isSoundOn) {
             soundPool?.play(gameOverSoundId, 1f, 1f, 1, 0, 1f)
         }
     }

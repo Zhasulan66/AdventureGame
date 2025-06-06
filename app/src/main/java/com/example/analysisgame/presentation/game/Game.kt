@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.view.MotionEvent
 import android.view.SurfaceHolder
+import androidx.navigation.NavController
 import com.example.analysisgame.domain.gamestates.Menu
 import com.example.analysisgame.domain.gamestates.PauseScreen
 import com.example.analysisgame.domain.gamestates.Playing
@@ -11,12 +12,14 @@ import com.example.analysisgame.domain.gamestates.Playing2
 import com.example.analysisgame.domain.gamestates.Playing3
 import com.example.analysisgame.domain.gamestates.Playing4
 import com.example.analysisgame.domain.gamestates.Playing5
+import com.example.analysisgame.presentation.navigation.Screen
 
 
 class Game(
     private val holder: SurfaceHolder,
-    private val context: Context,
-    var currentLevel: Int
+    val context: Context,
+    var currentLevel: Int,
+    val navController: NavController
 ) {
     private val gameLoop = GameLoop(this, holder)
     var currentGameState: GameState =
@@ -29,8 +32,8 @@ class Game(
             else -> GameState.MENU
         }
 
-    private var menu: Menu = Menu(this, currentLevel)
-    private var pauseScreen: PauseScreen = PauseScreen(this)
+    private var menu: Menu = Menu(this, currentLevel, navController)
+    private var pauseScreen: PauseScreen = PauseScreen(this, navController)
     private var playing: Playing = Playing(this, context, gameLoop)
     private var playing2: Playing2 = Playing2(this, context, gameLoop)
     private var playing3: Playing3 = Playing3(this, context, gameLoop)

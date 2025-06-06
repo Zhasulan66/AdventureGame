@@ -4,10 +4,16 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.view.MotionEvent
+import androidx.navigation.NavController
 import com.example.analysisgame.presentation.game.Game
+import com.example.analysisgame.presentation.navigation.Screen
 
 
-class Menu(val game: Game, val currentLevel: Int) : BaseState(game), GameStateInterface {
+class Menu(
+    val game: Game,
+    val currentLevel: Int,
+    val navController: NavController
+) : BaseState(game), GameStateInterface {
     private val paint: Paint = Paint()
 
     init {
@@ -19,11 +25,11 @@ class Menu(val game: Game, val currentLevel: Int) : BaseState(game), GameStateIn
     }
 
     override fun render(c: Canvas) {
-        c.drawText("MENU!", 800f, 200f, paint)
+        //c.drawText("MENU!", 800f, 200f, paint)
     }
 
     override fun touchEvents(event: MotionEvent) {
-        if (event.action == MotionEvent.ACTION_DOWN) {
+        /*if (event.action == MotionEvent.ACTION_DOWN) {
             when(currentLevel){
                 1 -> game.currentGameState = Game.GameState.PLAYING
                 2 -> game.currentGameState = Game.GameState.PLAYING2
@@ -32,6 +38,6 @@ class Menu(val game: Game, val currentLevel: Int) : BaseState(game), GameStateIn
                 5 -> game.currentGameState = Game.GameState.PLAYING5
             }
 
-        }
+        }*/
     }
 }

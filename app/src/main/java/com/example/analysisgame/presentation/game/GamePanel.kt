@@ -6,14 +6,19 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import androidx.navigation.NavController
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.gamestates.MusicManager
 import com.example.analysisgame.domain.gamestates.SoundEffectsManager
 
 
-class GamePanel(context: Context, val level: Int) : SurfaceView(context), SurfaceHolder.Callback {
+class GamePanel(
+    context: Context,
+    val level: Int,
+    navController: NavController
+) : SurfaceView(context), SurfaceHolder.Callback {
 
-    private val game = Game(holder, context, level)
+    private val game = Game(holder, context, level, navController)
 
     init {
         holder.addCallback(this)
