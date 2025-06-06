@@ -2,21 +2,15 @@ package com.example.analysisgame.presentation.game
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.view.MotionEvent
 import android.view.SurfaceHolder
-import com.example.analysisgame.domain.gamestates.DialogScreen
 import com.example.analysisgame.domain.gamestates.Menu
+import com.example.analysisgame.domain.gamestates.PauseScreen
 import com.example.analysisgame.domain.gamestates.Playing
 import com.example.analysisgame.domain.gamestates.Playing2
 import com.example.analysisgame.domain.gamestates.Playing3
 import com.example.analysisgame.domain.gamestates.Playing4
 import com.example.analysisgame.domain.gamestates.Playing5
-
-/*import com.example.analysisgame.domain.gamestates.Playing2
-import com.example.analysisgame.domain.gamestates.Playing3
-import com.example.analysisgame.domain.gamestates.Playing4
-import com.example.analysisgame.domain.gamestates.Playing5*/
 
 
 class Game(
@@ -25,22 +19,23 @@ class Game(
     var currentLevel: Int
 ) {
     private val gameLoop = GameLoop(this, holder)
-    var currentGameState: GameState = GameState.MENU
+    var currentGameState: GameState =
+        when(currentLevel) {
+            1 -> GameState.PLAYING
+            2 -> GameState.PLAYING2
+            3 -> GameState.PLAYING3
+            4 -> GameState.PLAYING4
+            5 -> GameState.PLAYING5
+            else -> GameState.MENU
+        }
 
     private var menu: Menu = Menu(this, currentLevel)
-    private var dialogScreen: DialogScreen = DialogScreen(this)
+    private var pauseScreen: PauseScreen = PauseScreen(this)
     private var playing: Playing = Playing(this, context, gameLoop)
     private var playing2: Playing2 = Playing2(this, context, gameLoop)
     private var playing3: Playing3 = Playing3(this, context, gameLoop)
     private var playing4: Playing4 = Playing4(this, context, gameLoop)
     private var playing5: Playing5 = Playing5(this, context, gameLoop)
-
-
-    var questionNum = 0
-
-    //var currentLevel = 1
-    var dialogNum = 0
-
 
     fun update() {
         when (currentGameState) {
@@ -50,16 +45,12 @@ class Game(
             GameState.PLAYING3 -> playing3.update()
             GameState.PLAYING4 -> playing4.update()
             GameState.PLAYING5 -> playing5.update()
-            GameState.DIALOG -> {
-                //initQuestionNum()
-                dialogScreen.update()
-            }
+            GameState.PAUSE ->  pauseScreen.update()
         }
     }
 
     fun render(c: Canvas) {
         //val c: Canvas = holder.lockCanvas()
-        //c.drawColor(Color.BLUE)
 
         //Draw the game
         when (currentGameState) {
@@ -84,12 +75,15 @@ class Game(
                 playing5.render(c)
             }
 
-            GameState.DIALOG -> {
+            GameState.PAUSE -> {
                 when (currentLevel) {
                     1 -> playing.render(c)
-                    //add text levels
+                    2 -> playing2.render(c)
+                    3 -> playing3.render(c)
+                    4 -> playing4.render(c)
+                    5 -> playing5.render(c)
                 }
-                dialogScreen.render(c)
+                pauseScreen.render(c)
             }
         }
 
@@ -104,7 +98,7 @@ class Game(
             GameState.PLAYING3 -> playing3.touchEvents(event)
             GameState.PLAYING4 -> playing4.touchEvents(event)
             GameState.PLAYING5 -> playing5.touchEvents(event)
-            GameState.DIALOG -> dialogScreen.touchEvents(event)
+            GameState.PAUSE -> pauseScreen.touchEvents(event)
         }
 
         return true
@@ -118,53 +112,8 @@ class Game(
         gameLoop.stopLoop()
     }
 
+
     enum class GameState {
-        MENU, DIALOG, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5
+        MENU, PAUSE, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5
     }
-
-    /*private fun initQuestionNum() {
-        when (currentLevel) {
-            1 -> {
-                if (dialogNum == 0)
-                    dialogScreen.setQuestion_num(0)
-                if (dialogNum == 1)
-                    dialogScreen.setQuestion_num(1)
-            }
-
-            2 -> {
-                if (dialogNum == 0) {
-                    dialogScreen.setQuestion_num(2);
-                }
-                if (dialogNum == 1) {
-                    dialogScreen.setQuestion_num(3);
-                }
-
-            }
-
-            3 -> {
-                if (dialogNum == 0) {
-                    dialogScreen.setQuestion_num(4);
-                }
-                if (dialogNum == 1) {
-                    dialogScreen.setQuestion_num(5);
-                }
-
-            }
-
-            4 -> {
-                if (dialogNum == 0) {
-                    dialogScreen.setQuestion_num(6);
-                }
-                if (dialogNum == 1) {
-                    dialogScreen.setQuestion_num(7);
-                }
-
-            }
-
-            5 -> {
-                dialogScreen.setQuestion_num(8);
-
-            }
-        }
-    }*/
 }

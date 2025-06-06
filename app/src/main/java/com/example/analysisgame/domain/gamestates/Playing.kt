@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
@@ -21,6 +23,7 @@ import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.graphics.Animator
+import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
@@ -29,19 +32,12 @@ import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import kotlin.random.Random
 
-
-/*
-class Playing(
-    val game: Game,
-    val context: Context,
-    gameLoop: GameLoop
-) : BaseState(game), GameStateInterface */
-
 class Playing(
     val game: Game,
     val context: Context,
     val gameLoop: GameLoop
 ) : BaseState(game), GameStateInterface {
+
 
     //private var gameLoop = GameLoop(this, surfaceHolder = holder)
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
@@ -80,9 +76,10 @@ class Playing(
     private var joystickPointerId = 0
 
     private val gameOver = GameOver(context)
+    private var gameOverStartTime = 0L
+    private var isGameOverSoundPlayed = false
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
-
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -136,13 +133,28 @@ class Playing(
             canvas.drawText(line, rect.left + 30f, rect.top + 100f, paint)
         }*/
         dialogueManager.draw(canvas)
+
+        drawPauseButton(canvas)
     }
 
     override fun update() {
-
         // Stop updating the game if the player is dead
         if (player.getHealthPoints() <= 0) {
-            return
+            // Play Game Over sound only once
+            if (!isGameOverSoundPlayed) {
+                isGameOverSoundPlayed = true
+                MusicManager.stopMusic()
+                SoundEffectsManager.playGameOver()
+                gameOverStartTime = System.currentTimeMillis()
+            }
+
+            // Wait 2 second, then go to Game Over state
+            if (System.currentTimeMillis() - gameOverStartTime > 2000) {
+                //game.currentGameState = Game.GameState.MENU // or GAME_OVER
+                SoundEffectsManager.release()
+            }
+
+            return // Stop the rest of the update
         }
 
         joystick.update()
@@ -161,8 +173,8 @@ class Playing(
         if (!npc.isPlayerNearby(player)) {
             npc.hasTalked = false
         }
-        //if(Skeleton.readyToSpawn())
-        //    skeletonList.add(Skeleton(context, player))
+        if(Skeleton.readyToSpawn())
+            skeletonList.add(Skeleton(context, player))
 
         for (skeleton in skeletonList)
             skeleton.update()
@@ -193,6 +205,7 @@ class Playing(
             if (Circle.isColliding(skeleton, player)) {
                 iteratorSkeleton.remove()
                 player.setHealthPoints((player.getHealthPoints() - 1))
+                SoundEffectsManager.playDamage()
                 continue
             }
 
@@ -217,15 +230,22 @@ class Playing(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN -> {
+                if(event.x > 2000 && event.y < 200){
+                    game.currentGameState = Game.GameState.PAUSE
+                    MusicManager.pauseMusic()
+                }
+
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {
                     numberOfSpellToCast++
+                    SoundEffectsManager.playFireball()
                 } else if (joystick.isPressed(event.x, event.y)) {
                     joystickPointerId = event.getPointerId(event.actionIndex)
                     joystick.isPressed = true
                 } else {
                     numberOfSpellToCast++
+                    SoundEffectsManager.playFireball()
                 }
                 //return true
             }

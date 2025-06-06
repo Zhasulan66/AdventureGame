@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.analysisgame.domain.gamestates.MusicManager
 import com.example.analysisgame.presentation.navigation.Navigation
 import com.example.analysisgame.presentation.ui.theme.AnalysisGameTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,6 +53,11 @@ class MainActivity : ComponentActivity() {
                 Navigation(this)
             }
         }
+    }
+
+    override fun onBackPressed() {
+        MusicManager.stopMusic() // stop music safely
+        super.onBackPressed()
     }
 
 

@@ -29,11 +29,6 @@ class DialogueManager {
 
     private val optionRects = mutableMapOf<Int, RectF>()
 
-    /*private val textPaint = Paint().apply {
-        color = android.graphics.Color.WHITE
-        textSize = 50f
-        isAntiAlias = true
-    }*/
     private val textPaint = TextPaint().apply {
         color = android.graphics.Color.WHITE
         textSize = 48f
@@ -127,26 +122,6 @@ class DialogueManager {
             }
         }
     }
-    /*fun draw(canvas: Canvas) {
-        if (!isDialogueActive) return
-
-        // Draw dialogue box
-        val box = RectF(50f, 200f, 1030f, 400f)
-        canvas.drawRoundRect(box, 20f, 20f, boxPaint)
-        canvas.drawText(currentLine, box.left + 30f, box.top + 60f, textPaint)
-
-        // Draw options if present
-        currentOptions?.let {
-            optionRects.clear()
-            it.forEachIndexed { index, option ->
-                val top = 450f + index * 110f
-                val rect = RectF(100f, top, 1000f, top + 90f)
-                canvas.drawRoundRect(rect, 15f, 15f, optionPaint)
-                canvas.drawText(option.text, rect.left + 40f, rect.centerY() + 20f, textPaint)
-                optionRects[index] = rect
-            }
-        }
-    }*/
 
     fun handleTouch(x: Float, y: Float) {
         if (!isDialogueActive) return

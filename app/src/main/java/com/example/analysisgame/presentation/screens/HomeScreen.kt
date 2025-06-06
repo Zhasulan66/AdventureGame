@@ -46,6 +46,7 @@ import com.example.analysisgame.presentation.viewmodel.MainViewModel
 fun HomeScreen (
     navController: NavController
 ){
+
     /*val viewModel = hiltViewModel<MainViewModel>()
     val loremState by viewModel.loremState.collectAsState()
 

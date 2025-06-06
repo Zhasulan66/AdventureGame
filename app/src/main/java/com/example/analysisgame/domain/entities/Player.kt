@@ -86,6 +86,36 @@ class Player(
 
     private fun canMoveTo(x: Float, y: Float): Boolean {
         val tileSize = 64
+        val r = radius
+
+        val pointsToCheck = listOf(
+            Pair(x - r, y - r), // Top-left
+            Pair(x + r, y - r), // Top-right
+            Pair(x - r, y + r), // Bottom-left
+            Pair(x + r, y + r)  // Bottom-right
+        )
+
+        for ((px, py) in pointsToCheck) {
+            val tileX = floor(px / tileSize).toInt()
+            val tileY = floor(py / tileSize).toInt()
+
+            if (tileX < 0 || tileX >= collisionLayer.width || tileY < 0 || tileY >= collisionLayer.height) {
+                return false // Out of bounds
+            }
+
+            val index = tileY * collisionLayer.width + tileX
+            val value = collisionLayer.data[index] + 1 // -1 shifted to 0
+
+            if (value != 0) {
+                return false // Collision
+            }
+        }
+
+        return true // All corners are walkable
+    }
+
+    /*private fun canMoveTo(x: Float, y: Float): Boolean {
+        val tileSize = 64
 
         val tileX = floor(x / tileSize).toInt()
         val tileY = floor(y / tileSize).toInt()
@@ -98,5 +128,5 @@ class Player(
         val value = collisionLayer.data[index] + 1 // because -1 shifted
 
         return value == 0 // walkable
-    }
+    }*/
 }

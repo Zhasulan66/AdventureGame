@@ -21,6 +21,7 @@ import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.graphics.Animator
+import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
@@ -35,6 +36,10 @@ class Playing3(
     val context: Context,
     val gameLoop: GameLoop
 ) : BaseState(game), GameStateInterface {
+
+    /*init {
+        MusicManager.startMusic(context, R.raw.penacony_dark)
+    }*/
 
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
 
@@ -117,12 +122,14 @@ class Playing3(
         }
 
         dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
     }
 
     override fun update() {
 
         // Stop updating the game if the player is dead
         if (player.getHealthPoints() <= 0) {
+            MusicManager.stopMusic()
             return
         }
 
@@ -198,6 +205,10 @@ class Playing3(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN -> {
+                if(event.x > 2000 && event.y < 200){
+                    game.currentGameState = Game.GameState.PAUSE
+                    MusicManager.pauseMusic()
+                }
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

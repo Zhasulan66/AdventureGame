@@ -6,14 +6,18 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.example.analysisgame.R
+import com.example.analysisgame.domain.gamestates.MusicManager
+import com.example.analysisgame.domain.gamestates.SoundEffectsManager
 
 
-class GamePanel(context: Context, level: Int) : SurfaceView(context), SurfaceHolder.Callback {
+class GamePanel(context: Context, val level: Int) : SurfaceView(context), SurfaceHolder.Callback {
 
     private val game = Game(holder, context, level)
 
     init {
         holder.addCallback(this)
+        SoundEffectsManager.init(context)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -23,6 +27,13 @@ class GamePanel(context: Context, level: Int) : SurfaceView(context), SurfaceHol
 
     override fun surfaceCreated(holder: SurfaceHolder) {
         Log.d("Game.kt", "surfaceCreated()")
+        when (level) {
+            1 -> MusicManager.startMusic(context, R.raw.disco_dj)
+            2 -> MusicManager.startMusic(context, R.raw.disco_dj)
+            3 -> MusicManager.startMusic(context, R.raw.penacony_dark)
+            4 -> MusicManager.startMusic(context, R.raw.disco_dj)
+            5 -> MusicManager.startMusic(context, R.raw.disco_dj)
+        }
         game.startGameLoop()
     }
 
@@ -32,6 +43,8 @@ class GamePanel(context: Context, level: Int) : SurfaceView(context), SurfaceHol
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
         Log.d("Game.kt", "surfaceDestroyed()")
+        MusicManager.stopMusic()
+        SoundEffectsManager.release()
         game.pauseGameLoop()
     }
 
