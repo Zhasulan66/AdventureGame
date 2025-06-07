@@ -13,13 +13,16 @@ import com.example.analysisgame.domain.gamestates.Playing3
 import com.example.analysisgame.domain.gamestates.Playing4
 import com.example.analysisgame.domain.gamestates.Playing5
 import com.example.analysisgame.presentation.navigation.Screen
+import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
 
 class Game(
     private val holder: SurfaceHolder,
     val context: Context,
     var currentLevel: Int,
-    val navController: NavController
+    val navController: NavController,
+    userName: String,
+    viewModel: MainViewModel
 ) {
     private val gameLoop = GameLoop(this, holder)
     var currentGameState: GameState =
@@ -34,11 +37,11 @@ class Game(
 
     private var menu: Menu = Menu(this, currentLevel, navController)
     private var pauseScreen: PauseScreen = PauseScreen(this, navController)
-    private var playing: Playing = Playing(this, context, gameLoop)
-    private var playing2: Playing2 = Playing2(this, context, gameLoop)
-    private var playing3: Playing3 = Playing3(this, context, gameLoop)
-    private var playing4: Playing4 = Playing4(this, context, gameLoop)
-    private var playing5: Playing5 = Playing5(this, context, gameLoop)
+    private var playing: Playing = Playing(this, context, gameLoop, userName, viewModel)
+    private var playing2: Playing2 = Playing2(this, context, gameLoop, userName, viewModel)
+    private var playing3: Playing3 = Playing3(this, context, gameLoop, userName, viewModel)
+    private var playing4: Playing4 = Playing4(this, context, gameLoop, userName, viewModel)
+    private var playing5: Playing5 = Playing5(this, context, gameLoop, userName, viewModel)
 
     fun update() {
         when (currentGameState) {

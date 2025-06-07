@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.analysisgame.presentation.LanguageManager
+import com.example.analysisgame.presentation.screens.ChooseLevelScreen
 import com.example.analysisgame.presentation.screens.GameScreen
 import com.example.analysisgame.presentation.screens.HomeScreen
 import com.example.analysisgame.presentation.screens.SplashScreen
@@ -71,7 +72,14 @@ fun Navigation(
             )
         }
 
-        //HomeScreen
+        //ChooseLevelScreen
+        composable(route = Screen.ChooseLevelScreen.route){
+            ChooseLevelScreen(
+                navController = navController,
+            )
+        }
+
+        //GameScreen
         composable(route = Screen.GameScreen.route + "/{level}",
             arguments = listOf(
                 navArgument("level"){

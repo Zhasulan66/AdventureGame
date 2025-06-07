@@ -27,13 +27,16 @@ import com.example.analysisgame.domain.map.parseLayers
 import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
+import com.example.analysisgame.presentation.viewmodel.MainViewModel
 import kotlin.random.Random
 
 
 class Playing4(
     val game: Game,
     val context: Context,
-    val gameLoop: GameLoop
+    val gameLoop: GameLoop,
+    userName: String,
+    viewModel: MainViewModel
 ) : BaseState(game), GameStateInterface {
 
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
@@ -64,7 +67,9 @@ class Playing4(
         imageResId = R.drawable.npc_img,
         positionX = 2200f,
         positionY = 2200f,
-        player
+        player,
+        viewModel,
+        userName
     )
     val dialogueManager = DialogueManager()
 

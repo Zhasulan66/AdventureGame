@@ -10,15 +10,18 @@ import androidx.navigation.NavController
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.gamestates.MusicManager
 import com.example.analysisgame.domain.gamestates.SoundEffectsManager
+import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
 
 class GamePanel(
     context: Context,
     val level: Int,
-    navController: NavController
+    navController: NavController,
+    userName: String,
+    viewModel: MainViewModel
 ) : SurfaceView(context), SurfaceHolder.Callback {
 
-    private val game = Game(holder, context, level, navController)
+    private val game = Game(holder, context, level, navController, userName, viewModel)
 
     init {
         holder.addCallback(this)

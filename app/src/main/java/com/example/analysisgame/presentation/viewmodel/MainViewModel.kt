@@ -3,8 +3,11 @@ package com.example.analysisgame.presentation.viewmodel
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.analysisgame.domain.model.LoremText
+import com.example.analysisgame.domain.model.AnswerRequest
+import com.example.analysisgame.domain.model.AnswerResponse
 import com.example.analysisgame.domain.model.Resource
+import com.example.analysisgame.domain.model.UserRequest
+import com.example.analysisgame.domain.model.UserResponse
 import com.example.analysisgame.domain.repository.AnalysisGameRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,17 +22,37 @@ class MainViewModel @Inject constructor(
     private val application: Application
 ) : ViewModel() {
 
-    private val _loremState = MutableStateFlow<Resource<LoremText>>(Resource.Initial)
-    val loremState: StateFlow<Resource<LoremText>> = _loremState.asStateFlow()
+    private val _userState = MutableStateFlow<Resource<UserResponse>>(Resource.Initial)
+    val userState: StateFlow<Resource<UserResponse>> = _userState.asStateFlow()
 
-    fun fetchLoremWithNum(num: String) {
+    fun registerUser(userRequest: UserRequest){
         viewModelScope.launch {
-            _loremState.value = Resource.Loading
+            _userState.value = Resource.Loading
             try {
-                val response = repository.getLoremText(num)
-                _loremState.value = Resource.Success(response)
+                val response = repository.registerUser(userRequest)
+                _userState.value = Resource.Success(response)
             } catch (e: Exception) {
-                _loremState.value = Resource.Error(e)
+                _userState.value = Resource.Error(e)
+            }
+        }
+    }
+
+    fun successUserState(username: String){
+        _userState.value = Resource.Success(UserResponse(1, username, "", null, null))
+    }
+
+
+    private val _answerState = MutableStateFlow<Resource<AnswerResponse>>(Resource.Initial)
+    val answerResponse: StateFlow<Resource<AnswerResponse>> = _answerState.asStateFlow()
+
+    fun createAnswer(answerRequest: AnswerRequest){
+        viewModelScope.launch {
+            _answerState.value = Resource.Loading
+            try {
+                val response = repository.createAnswer(answerRequest)
+                _answerState.value = Resource.Success(response)
+            } catch (e: Exception) {
+                _answerState.value = Resource.Error(e)
             }
         }
     }

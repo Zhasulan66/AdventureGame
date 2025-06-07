@@ -37,7 +37,7 @@ object AnalysisGameModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("https://fakeapi.net/")    //https://goplacekz.onrender.com/api/
+            .baseUrl("http://192.168.1.3:8080/")    //https://goplacekz.onrender.com/api/
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -46,9 +46,9 @@ object AnalysisGameModule {
 
     @Provides
     @Singleton
-    fun provideReserveEasyRepository(
-        reserveEasyApiService: AnalysisGameApiService
+    fun provideAnalysisGameRepository(
+        analysisGameRepository: AnalysisGameApiService
     ) : AnalysisGameRepository {
-        return AnalysisGameRepositoryImpl(reserveEasyApiService)
+        return AnalysisGameRepositoryImpl(analysisGameRepository)
     }
 }

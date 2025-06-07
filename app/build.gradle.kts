@@ -84,6 +84,8 @@ dependencies {
 
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.30.1")
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
 }
 
 kapt {

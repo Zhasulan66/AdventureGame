@@ -7,9 +7,12 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Rect
 import androidx.annotation.DrawableRes
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.analysisgame.domain.gamestates.DialogueLine
 import com.example.analysisgame.domain.gamestates.DialogueOption
+import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.GameDisplay
+import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
 class NPC_Elder(
     context: Context,
@@ -17,6 +20,8 @@ class NPC_Elder(
     positionX: Float,
     positionY: Float,
     private val player: Player,
+    val viewModel: MainViewModel,
+    val userName: String
 ) : GameObject(positionX, positionY) {
 
     var hasTalked = false
@@ -68,10 +73,22 @@ class NPC_Elder(
                 DialogueLine("Hello, traveler! Choose your path:Hello, traveler! Choose your path:Hello, traveler! Choose your path:" +
                         "Hello, traveler! Choose your path:", listOf(
 
-                    DialogueOption("Adventure") { println("Adventure chosen") },
-                    DialogueOption("Wisdom") { println("Wisdom chosen") },
-                    DialogueOption("GoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGold") { println("Gold chosen") },
-                    DialogueOption("Nothing") { println("Nothing chosen") }
+                    DialogueOption("Adventure") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 0))
+                        println("Adventure chosen")
+                                                },
+                    DialogueOption("Wisdom") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 1))
+                        println("Wisdom chosen")
+                                             },
+                    DialogueOption("GoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGoldGold") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 2))
+                        println("Gold chosen")
+                                                                                                   },
+                    DialogueOption("Nothing") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 3))
+                        println("Nothing chosen")
+                    }
                 )),
                 DialogueLine("Farewell.")
             )

@@ -1,42 +1,22 @@
 package com.example.analysisgame.data.repository
 
 import com.example.analysisgame.data.remote.AnalysisGameApiService
-import com.example.analysisgame.domain.model.LoremText
+import com.example.analysisgame.domain.model.AnswerRequest
+import com.example.analysisgame.domain.model.AnswerResponse
+import com.example.analysisgame.domain.model.UserRequest
+import com.example.analysisgame.domain.model.UserResponse
 import com.example.analysisgame.domain.repository.AnalysisGameRepository
 
 class AnalysisGameRepositoryImpl(
     private val api: AnalysisGameApiService
 ) : AnalysisGameRepository {
 
-    override suspend fun getLoremText(num: String): LoremText {
-        return api.getLorem(num)
-    }
-    /*override suspend fun registerUser(userRequest: UserRequest): User {
+    override suspend fun registerUser(userRequest: UserRequest): UserResponse {
         return api.registerUser(userRequest)
     }
 
-    override suspend fun loginUser(userRequest: UserRequest): LoginResponse {
-        return api.loginUser(userRequest)
+    override suspend fun createAnswer(answerRequest: AnswerRequest): AnswerResponse {
+        return api.createAnswer(answerRequest)
     }
-
-    override suspend fun getAllRestaurants(): RestaurantsResponse {
-        return api.getAllRestaurants()
-    }
-
-    override suspend fun getRestaurantById(id: String): RestaurantResponse {
-        return api.getRestaurantById(id)
-    }
-
-    override suspend fun getAllBookings(): BookingResponse {
-        return api.getAllBookings()
-    }
-
-    override suspend fun getTableScheme(restaurantId: String): TableSchemeResponse {
-        return api.getTableScheme(restaurantId)
-    }
-
-    override suspend fun createBooking(bookingRequest: BookingRequest): BookingIdResponse {
-        return api.createBooking(bookingRequest)
-    }*/
 
 }
