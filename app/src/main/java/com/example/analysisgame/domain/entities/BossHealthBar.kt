@@ -2,17 +2,15 @@ package com.example.analysisgame.domain.entities
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import androidx.core.content.ContextCompat
 import com.example.analysisgame.R
+import com.example.analysisgame.domain.entities.enemies.BossEnemy
 import com.example.analysisgame.presentation.game.GameDisplay
 
-
-
-class HealthBar(
+class BossHealthBar(
     context: Context,
-    val player: Player,
+    val boss: BossEnemy,
     private val healthColor: Int
 ) {
     private val borderPaint = Paint().apply {
@@ -22,15 +20,15 @@ class HealthBar(
         color = healthColor//ContextCompat.getColor(context, R.color.healthBarHealth)
     }
 
-    private val width = 100f
+    private val width = 200f
     private val height = 20f
     private val margin = 2f
 
     fun draw(canvas: Canvas, gameDisplay: GameDisplay) {
-        val x = player.positionX
-        val y = player.positionY
+        val x = boss.positionX
+        val y = boss.positionY
         val distanceToPlayer = 50f
-        var healthPointPercentage = player.getHealthPoints() / 5f
+        var healthPointPercentage = boss.getHealthPoints() / 20f
 
         //draw border
         val borderLeft = x - width / 2

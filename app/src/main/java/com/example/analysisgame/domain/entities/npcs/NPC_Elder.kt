@@ -1,13 +1,12 @@
-package com.example.analysisgame.domain.entities
+package com.example.analysisgame.domain.entities.npcs
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Rect
 import androidx.annotation.DrawableRes
-import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.analysisgame.domain.entities.GameObject
+import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.gamestates.DialogueLine
 import com.example.analysisgame.domain.gamestates.DialogueOption
 import com.example.analysisgame.domain.model.AnswerRequest

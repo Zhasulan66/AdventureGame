@@ -38,4 +38,11 @@ class Constants {
         const val SPEED: Int = 10
         const val AMOUNT: Int = 4
     }
+
+    object BossState {
+        const val IDLE = 0
+        const val ATTACK = 1
+        const val MOVE = 2
+        const val DEATH = 3
+    }
 }

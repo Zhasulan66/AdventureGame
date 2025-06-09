@@ -104,11 +104,46 @@ fun UserSuccessScreen(
         Spacer(modifier = Modifier.height(60.dp))
         Text("Welcome to Home Screen")
         Spacer(modifier = Modifier.height(20.dp))
-        if (userResponse.username != null) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ){
             Text(text = "Welcome back, ${userResponse.username}!")
-        } else {
-            Text(text = "Saving default username...")
+
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.Cyan)
+                    .clickable {
+                        navController.navigate(Screen.SettingsScreen.route)
+                    },
+                contentAlignment = Alignment.Center
+            ){
+                Text("settings")
+            }
         }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ){
+            Box(
+                modifier = Modifier
+                    .width(100.dp)
+                    .height(40.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Color.Cyan)
+                    .clickable {
+                        navController.navigate(Screen.ProfileScreen.route)
+                    },
+                contentAlignment = Alignment.Center
+            ){
+                Text("profile")
+            }
+        }
+
+
         Spacer(modifier = Modifier.height(40.dp))
         Row(
             modifier = Modifier

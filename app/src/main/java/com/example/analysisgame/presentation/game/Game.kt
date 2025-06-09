@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import androidx.navigation.NavController
+import com.example.analysisgame.domain.gamestates.LoreScreen1
 import com.example.analysisgame.domain.gamestates.Menu
 import com.example.analysisgame.domain.gamestates.PauseScreen
 import com.example.analysisgame.domain.gamestates.Playing
@@ -12,7 +13,6 @@ import com.example.analysisgame.domain.gamestates.Playing2
 import com.example.analysisgame.domain.gamestates.Playing3
 import com.example.analysisgame.domain.gamestates.Playing4
 import com.example.analysisgame.domain.gamestates.Playing5
-import com.example.analysisgame.presentation.navigation.Screen
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
 
@@ -27,7 +27,7 @@ class Game(
     private val gameLoop = GameLoop(this, holder)
     var currentGameState: GameState =
         when(currentLevel) {
-            1 -> GameState.PLAYING
+            1 -> GameState.LORE1
             2 -> GameState.PLAYING2
             3 -> GameState.PLAYING3
             4 -> GameState.PLAYING4
@@ -42,6 +42,7 @@ class Game(
     private var playing3: Playing3 = Playing3(this, context, gameLoop, userName, viewModel)
     private var playing4: Playing4 = Playing4(this, context, gameLoop, userName, viewModel)
     private var playing5: Playing5 = Playing5(this, context, gameLoop, userName, viewModel)
+    private var loreScreen1: LoreScreen1 = LoreScreen1(this)
 
     fun update() {
         when (currentGameState) {
@@ -52,6 +53,7 @@ class Game(
             GameState.PLAYING4 -> playing4.update()
             GameState.PLAYING5 -> playing5.update()
             GameState.PAUSE ->  pauseScreen.update()
+            GameState.LORE1 -> loreScreen1.update()
         }
     }
 
@@ -91,6 +93,8 @@ class Game(
                 }
                 pauseScreen.render(c)
             }
+
+            GameState.LORE1 -> loreScreen1.render(c)
         }
 
         //holder.unlockCanvasAndPost(c)
@@ -105,6 +109,7 @@ class Game(
             GameState.PLAYING4 -> playing4.touchEvents(event)
             GameState.PLAYING5 -> playing5.touchEvents(event)
             GameState.PAUSE -> pauseScreen.touchEvents(event)
+            GameState.LORE1 -> loreScreen1.touchEvents(event)
         }
 
         return true
@@ -120,6 +125,6 @@ class Game(
 
 
     enum class GameState {
-        MENU, PAUSE, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5
+        MENU, PAUSE, PLAYING, PLAYING2, PLAYING3, PLAYING4, PLAYING5, LORE1
     }
 }

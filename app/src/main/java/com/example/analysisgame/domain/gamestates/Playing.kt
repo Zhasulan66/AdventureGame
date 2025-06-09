@@ -5,23 +5,22 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.os.Handler
-import android.os.Looper
-import android.util.Log
+import android.graphics.Paint
 import android.view.MotionEvent
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.CollectibleItem
 import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.NPC_Elder
+import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
+import com.example.analysisgame.domain.entities.npcs.NPC_Knight
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
@@ -31,7 +30,6 @@ import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
-import kotlin.random.Random
 
 class Playing(
     val game: Game,
@@ -66,16 +64,21 @@ class Playing(
 
     private val skeletonList = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
+
     private val npc = NPC_Elder(
-        context = context,
-        imageResId = R.drawable.npc_img,
-        positionX = 2200f,
-        positionY = 2200f,
-        player,
-        viewModel,
-        userName
+        context = context, imageResId = R.drawable.npc_elder,
+        positionX = 3300f, positionY = 3300f,
+        player, viewModel, userName
+    )
+    private val npc_knight = NPC_Knight(
+        context = context, imageResId = R.drawable.npc_knight,
+        positionX = 2950f, positionY = 450f,
+        player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
+
+    val items = mutableListOf<CollectibleItem>()
+    private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -85,6 +88,10 @@ class Playing(
     private var isGameOverSoundPlayed = false
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
+
+    init {
+        items.add(CollectibleItem(ItemType.BOOK, book_bitmap, 2100f, 2100f, 15f, 12f))
+    }
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -116,6 +123,10 @@ class Playing(
             spell.draw(canvas, gameDisplay)
 
         npc.draw(canvas, gameDisplay)
+        npc_knight.draw(canvas, gameDisplay)
+        for (item in items) {
+            item.draw(canvas, gameDisplay)
+        }
 
         // Draw game panels
         joystick.draw(canvas)
@@ -126,17 +137,6 @@ class Playing(
             gameOver.draw(canvas)
         }
 
-        /*dialogueManager.getCurrentLine()?.let { line ->
-            val paint = Paint().apply {
-                color = Color.WHITE
-                textSize = 50f
-            }
-            val bgPaint = Paint().apply { color = Color.BLACK }
-
-            val rect = RectF(100f, canvas.height - 300f, canvas.width - 100f, canvas.height - 100f)
-            canvas.drawRoundRect(rect, 20f, 20f, bgPaint)
-            canvas.drawText(line, rect.left + 30f, rect.top + 100f, paint)
-        }*/
         dialogueManager.draw(canvas)
 
         drawPauseButton(canvas)
@@ -178,8 +178,8 @@ class Playing(
         if (!npc.isPlayerNearby(player)) {
             npc.hasTalked = false
         }
-        if(Skeleton.readyToSpawn())
-            skeletonList.add(Skeleton(context, player))
+        /*if(Skeleton.readyToSpawn())
+            skeletonList.add(Skeleton(context, player))*/
 
         for (skeleton in skeletonList)
             skeleton.update()
@@ -189,6 +189,20 @@ class Playing(
             spellList.add(Spell(context, player))
             println("spell amount ${spellList.size}")
             numberOfSpellToCast--
+        }
+
+        for (item in items) {
+            if (item.checkCollisionWithPlayer(player)) {
+                when (item.type) {
+                    ItemType.BOOK -> { /* collect book */ }
+                    ItemType.KEY -> { /* unlock door */ }
+                    ItemType.HEALTH_POTION -> {
+
+                    }
+                }
+                items.remove(item) // or mark as collected
+                break // avoid ConcurrentModificationException
+            }
         }
 
         val spellIterator = spellList.iterator()

@@ -34,7 +34,7 @@ class Player(
     }
 
     private var healthPoints = MAX_HEALTH_POINTS
-    private val healthBar = HealthBar(context, this)
+    private val healthBar = HealthBar(context, this, ContextCompat.getColor(context, R.color.healthBarHealth))
 
 
     override fun draw(canvas: Canvas, gameDisplay: GameDisplay) {

@@ -2,10 +2,8 @@ package com.example.analysisgame.presentation.navigation
 
 import android.app.Activity
 import android.content.Context
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -19,8 +17,9 @@ import com.example.analysisgame.presentation.LanguageManager
 import com.example.analysisgame.presentation.screens.ChooseLevelScreen
 import com.example.analysisgame.presentation.screens.GameScreen
 import com.example.analysisgame.presentation.screens.HomeScreen
+import com.example.analysisgame.presentation.screens.ProfileScreen
+import com.example.analysisgame.presentation.screens.SettingsScreen
 import com.example.analysisgame.presentation.screens.SplashScreen
-import com.example.analysisgame.presentation.screens.auth.LoginScreen
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
@@ -58,13 +57,6 @@ fun Navigation(
             )
         }
 
-        //LoginScreen
-        composable(route = Screen.LoginScreen.route) {
-            LoginScreen(
-                navController = navController,
-            )
-        }
-
         //HomeScreen
         composable(route = Screen.HomeScreen.route) {
             HomeScreen(
@@ -94,5 +86,21 @@ fun Navigation(
                 level = entry.arguments!!.getInt("level")
             )
         }
+
+        //ProfileScreen
+        composable(route = Screen.ProfileScreen.route) {
+            ProfileScreen(
+                navController = navController,
+            )
+        }
+
+        //SettingsScreen
+        composable(route = Screen.SettingsScreen.route) {
+            SettingsScreen(
+                navController = navController,
+            )
+        }
+
+
     }
 }

@@ -16,12 +16,14 @@ import com.example.analysisgame.presentation.game.GameLoop
 class Skeleton(
     context: Context,
     private val player: Player,
+    val x: Float,
+    val y: Float,
 ) :
     Circle(
         context,
         ContextCompat.getColor(context, R.color.enemy),
-        1000f,
-        500f,
+        x,
+        y,
         30f
     ) {
 

@@ -5,17 +5,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.util.Log
 import android.view.MotionEvent
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.GameOver
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.NPC_Elder
+import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
@@ -28,7 +25,6 @@ import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
-import kotlin.random.Random
 
 
 class Playing4(
@@ -64,7 +60,7 @@ class Playing4(
     private val spellList = ArrayList<Spell>()
     private val npc = NPC_Elder(
         context = context,
-        imageResId = R.drawable.npc_img,
+        imageResId = R.drawable.npc_elder,
         positionX = 2200f,
         positionY = 2200f,
         player,
