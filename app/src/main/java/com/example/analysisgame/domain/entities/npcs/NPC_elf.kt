@@ -14,7 +14,7 @@ import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
-class NPC_Elder(
+class NPC_elf(
     context: Context,
     @DrawableRes imageResId: Int,
     positionX: Float,
@@ -63,77 +63,78 @@ class NPC_Elder(
                 DialogueLine("Please, make yourself at home.")
             )
             1 -> listOf(
-                DialogueLine("A scene reminds you of a previous tragic moment in the game.", listOf(
+                DialogueLine("An NPC gives you vague instructions. How do you feel?", listOf(
 
-                    DialogueOption("Just part of the story") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 17, 0))
+                    DialogueOption("Fine — I’ll figure it out") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 9, 0))
                     },
-                    DialogueOption("Feel a little sad") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 17, 1))
+                    DialogueOption("Slightly confused") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 9, 1))
                     },
-                    DialogueOption("Get emotional again") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 17, 2))
+                    DialogueOption("Nervous I’ll mess up") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 9, 2))
                     },
-                    DialogueOption("Try to avoid it completely") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 17, 3))
+                    DialogueOption("I don’t even try") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 9, 3))
                     }
                 )),
                 DialogueLine("Farewell.")
             )
             2 -> listOf(
-                DialogueLine("You’re asked to stay still and observe something for 30 seconds.", listOf(
+                DialogueLine("You find a big reward. How do you feel?", listOf(
 
-                    DialogueOption("I observe peacefully") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 18, 0))
+                    DialogueOption("Happy and proud") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 0))
                     },
-                    DialogueOption("I fidget a little") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 18, 1))
+                    DialogueOption("It’s cool, I guess") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 1))
                     },
-                    DialogueOption("I get up and explore") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 18, 2))
+                    DialogueOption("Doesn’t matter much") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 2))
                     },
-                    DialogueOption("I don’t even try") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 18, 3))
+                    DialogueOption("I didn’t deserve it") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 3))
                     }
                 )),
                 DialogueLine("Farewell.")
             )
             3 -> listOf(
-                DialogueLine("The final mission is emotionally heavy. How do you feel?", listOf(
+                DialogueLine("You hear a loud explosion nearby. Your reaction?", listOf(
 
-                    DialogueOption("Empowered") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 19, 0))
+                    DialogueOption("Let’s check it out!") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 11, 0))
                     },
-                    DialogueOption("Mixed emotions") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 19, 1))
+                    DialogueOption("Careful approach") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 11, 1))
                     },
-                    DialogueOption("Emotionally drained") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 19, 2))
+                    DialogueOption("Panic a bit") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 11, 2))
                     },
-                    DialogueOption("Hopeless") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 19, 3))
+                    DialogueOption("Freeze or hide") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 11, 3))
                     }
                 )),
                 DialogueLine("Farewell.")
             )
             4 -> listOf(
-                DialogueLine("You complete the game. What’s your reaction?", listOf(
+                DialogueLine("You’re distracted mid-quest. What caused it?", listOf(
 
-                    DialogueOption("That was awesome") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 20, 0))
+                    DialogueOption("Nothing — I’m focused") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 12, 0))
                     },
-                    DialogueOption("Cool, I guess") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 20, 1))
+                    DialogueOption("A shiny thing") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 12, 1))
                     },
-                    DialogueOption("Didn’t feel much") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 20, 2))
+                    DialogueOption("A wandering thought") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 12, 2))
                     },
-                    DialogueOption("I don’t care") {
-                        viewModel.createAnswer(AnswerRequest(userName, 5, 20, 3))
+                    DialogueOption("I don’t know — I’m always distracted") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 12, 3))
                     }
                 )),
                 DialogueLine("Farewell.")
             )
+
             else -> listOf(
                 DialogueLine("I have nothing more to say... for now.")
             )

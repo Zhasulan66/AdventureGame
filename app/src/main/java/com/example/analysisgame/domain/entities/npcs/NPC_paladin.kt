@@ -14,7 +14,7 @@ import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
-class NPC_Knight(
+class NPC_paladin(
     context: Context,
     @DrawableRes imageResId: Int,
     positionX: Float,
@@ -63,36 +63,38 @@ class NPC_Knight(
                 DialogueLine("Please, make yourself at home.")
             )
             1 -> listOf(
-                DialogueLine("A bush rustles suddenly. What’s your reaction?", listOf(
-                    DialogueOption("Curious — check it out"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 0))
+                DialogueLine("A character praises your actions. How do you feel?", listOf(
+
+                    DialogueOption("Grateful and confident") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 14, 0))
                     },
-                    DialogueOption("Cautious — approach slowly"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 1))
+                    DialogueOption("A bit awkward") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 14, 1))
                     },
-                    DialogueOption("Startled — pause or back off"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 2))
+                    DialogueOption("It feels fake") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 14, 2))
                     },
-                    DialogueOption("Panic — run away"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 3))
-                    },
+                    DialogueOption("I don’t believe them") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 14, 3))
+                    }
                 )),
                 DialogueLine("Farewell.")
             )
             2 -> listOf(
-                DialogueLine("You’re about to enter a mysterious area. What’s your first thought?", listOf(
-                    DialogueOption("Exciting! Let’s go"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 0))
+                DialogueLine("How often do you overthink the consequences of in-game choices?", listOf(
+
+                    DialogueOption("Rarely") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 16, 0))
                     },
-                    DialogueOption("I’ll go but carefully"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 1))
+                    DialogueOption("Sometimes") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 16, 1))
                     },
-                    DialogueOption("What if something bad happens?"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 2))
+                    DialogueOption("Often") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 16, 2))
                     },
-                    DialogueOption("I’d rather avoid it"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 3))
-                    },
+                    DialogueOption("Constantly") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 16, 3))
+                    }
                 )),
                 DialogueLine("Farewell.")
             )

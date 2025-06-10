@@ -88,9 +88,17 @@ fun Navigation(
         }
 
         //ProfileScreen
-        composable(route = Screen.ProfileScreen.route) {
+        composable(route = Screen.ProfileScreen.route + "/{username}",
+            arguments = listOf(
+                navArgument("username"){
+                    type = NavType.StringType
+                    defaultValue = " "
+                    nullable = false
+                }
+            )) { entry ->
             ProfileScreen(
                 navController = navController,
+                userName = entry.arguments!!.getString("username")!!
             )
         }
 

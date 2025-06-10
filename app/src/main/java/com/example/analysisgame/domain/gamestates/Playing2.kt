@@ -10,14 +10,19 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.CollectibleItem
 import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
+import com.example.analysisgame.domain.entities.npcs.NPC_farmer
+import com.example.analysisgame.domain.entities.npcs.NPC_hunter
 import com.example.analysisgame.domain.graphics.Animator
+import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
@@ -58,16 +63,14 @@ class Playing2(
 
     private val skeletonList = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
-    private val npc = NPC_Elder(
-        context = context,
-        imageResId = R.drawable.npc_elder,
-        positionX = 2200f,
-        positionY = 2200f,
-        player,
-        viewModel,
-        userName
+    private val npc_hunter = NPC_hunter(
+        context = context, imageResId = R.drawable.npc_hunter,
+        positionX = 650f, positionY = 350f,
+        player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
+    val items = mutableListOf<CollectibleItem>()
+    private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -76,6 +79,9 @@ class Playing2(
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
+    init {
+        items.add(CollectibleItem(ItemType.BOOK, book_bitmap, 2100f, 2100f, 15f, 12f))
+    }
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -106,7 +112,7 @@ class Playing2(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        npc.draw(canvas, gameDisplay)
+        npc_hunter.draw(canvas, gameDisplay)
 
         // Draw game panels
         joystick.draw(canvas)
@@ -118,6 +124,7 @@ class Playing2(
         }
 
         dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
     }
 
     override fun update() {
@@ -130,18 +137,18 @@ class Playing2(
         joystick.update()
         player.update()
 
-        if (npc.isPlayerNearby(player)
+        if (npc_hunter.isPlayerNearby(player)
             && !dialogueManager.isDialogueActive
-            && !npc.hasTalked
+            && !npc_hunter.hasTalked
         ) {
-            dialogueManager.startDialogue(npc.getDialogueLines())
-            npc.talkCount++
-            npc.hasTalked = true
+            dialogueManager.startDialogue(npc_hunter.getDialogueLines())
+            npc_hunter.talkCount++
+            npc_hunter.hasTalked = true
         }
 
         // Reset the flag when player walks away
-        if (!npc.isPlayerNearby(player)) {
-            npc.hasTalked = false
+        if (!npc_hunter.isPlayerNearby(player)) {
+            npc_hunter.hasTalked = false
         }
         //if(Skeleton.readyToSpawn())
         //    skeletonList.add(Skeleton(context, player))
@@ -199,6 +206,11 @@ class Playing2(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN -> {
+                if(event.x > 2000 && event.y < 200){
+                    game.currentGameState = Game.GameState.PAUSE
+                    MusicManager.pauseMusic()
+                }
+
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

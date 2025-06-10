@@ -37,7 +37,7 @@ object AnalysisGameModule {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl("http://192.168.1.3:8080/")    //https://goplacekz.onrender.com/api/
+            .baseUrl("http://192.168.1.6:8080/")    //https://goplacekz.onrender.com/api/
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()

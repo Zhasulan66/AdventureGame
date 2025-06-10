@@ -14,7 +14,7 @@ import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
-class NPC_Knight(
+class NPC_archer(
     context: Context,
     @DrawableRes imageResId: Int,
     positionX: Float,
@@ -63,36 +63,38 @@ class NPC_Knight(
                 DialogueLine("Please, make yourself at home.")
             )
             1 -> listOf(
-                DialogueLine("A bush rustles suddenly. What’s your reaction?", listOf(
-                    DialogueOption("Curious — check it out"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 0))
+                DialogueLine("You enter a place like one where something bad happened earlier.", listOf(
+
+                    DialogueOption("It’s fine") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 13, 0))
                     },
-                    DialogueOption("Cautious — approach slowly"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 1))
+                    DialogueOption("A little eerie") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 13, 1))
                     },
-                    DialogueOption("Startled — pause or back off"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 2))
+                    DialogueOption("Feel nervous") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 13, 2))
                     },
-                    DialogueOption("Panic — run away"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 3))
-                    },
+                    DialogueOption("Avoid going in") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 13, 3))
+                    }
                 )),
                 DialogueLine("Farewell.")
             )
             2 -> listOf(
-                DialogueLine("You’re about to enter a mysterious area. What’s your first thought?", listOf(
-                    DialogueOption("Exciting! Let’s go"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 0))
+                DialogueLine("You must complete a boring but necessary task.", listOf(
+
+                    DialogueOption("No problem") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 15, 0))
                     },
-                    DialogueOption("I’ll go but carefully"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 1))
+                    DialogueOption("It’s hard to focus") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 15, 1))
                     },
-                    DialogueOption("What if something bad happens?"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 2))
+                    DialogueOption("I get distracted easily") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 15, 2))
                     },
-                    DialogueOption("I’d rather avoid it"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 3))
-                    },
+                    DialogueOption("I avoid it completely") {
+                        viewModel.createAnswer(AnswerRequest(userName, 4, 15, 3))
+                    }
                 )),
                 DialogueLine("Farewell.")
             )

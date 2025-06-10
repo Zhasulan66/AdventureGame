@@ -10,14 +10,21 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.CollectibleItem
 import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
+import com.example.analysisgame.domain.entities.npcs.NPC_Knight
+import com.example.analysisgame.domain.entities.npcs.NPC_archer
+import com.example.analysisgame.domain.entities.npcs.NPC_farmer
+import com.example.analysisgame.domain.entities.npcs.NPC_paladin
 import com.example.analysisgame.domain.graphics.Animator
+import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
@@ -58,16 +65,19 @@ class Playing4(
 
     private val skeletonList = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
-    private val npc = NPC_Elder(
-        context = context,
-        imageResId = R.drawable.npc_elder,
-        positionX = 2200f,
-        positionY = 2200f,
-        player,
-        viewModel,
-        userName
+    private val npc_archer = NPC_archer(
+        context = context, imageResId = R.drawable.npc_archer,
+        positionX = 550f, positionY = 1150f,
+        player, viewModel, userName
+    )
+    private val npc_paladin = NPC_paladin(
+        context = context, imageResId = R.drawable.npc_paladin,
+        positionX = 1800f, positionY = 1200f,
+        player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
+    val items = mutableListOf<CollectibleItem>()
+    private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -76,6 +86,9 @@ class Playing4(
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
+    init {
+        items.add(CollectibleItem(ItemType.BOOK, book_bitmap, 2100f, 2100f, 15f, 12f))
+    }
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -106,7 +119,8 @@ class Playing4(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        npc.draw(canvas, gameDisplay)
+        npc_archer.draw(canvas, gameDisplay)
+        npc_paladin.draw(canvas, gameDisplay)
 
         // Draw game panels
         joystick.draw(canvas)
@@ -118,6 +132,7 @@ class Playing4(
         }
 
         dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
     }
 
     override fun update() {
@@ -130,18 +145,31 @@ class Playing4(
         joystick.update()
         player.update()
 
-        if (npc.isPlayerNearby(player)
+        if (npc_archer.isPlayerNearby(player)
             && !dialogueManager.isDialogueActive
-            && !npc.hasTalked
+            && !npc_archer.hasTalked
         ) {
-            dialogueManager.startDialogue(npc.getDialogueLines())
-            npc.talkCount++
-            npc.hasTalked = true
+            dialogueManager.startDialogue(npc_archer.getDialogueLines())
+            npc_archer.talkCount++
+            npc_archer.hasTalked = true
+        }
+        // Reset the flag when player walks away
+        if (!npc_archer.isPlayerNearby(player)) {
+            npc_archer.hasTalked = false
+        }
+
+        if (npc_paladin.isPlayerNearby(player)
+            && !dialogueManager.isDialogueActive
+            && !npc_paladin.hasTalked
+        ) {
+            dialogueManager.startDialogue(npc_paladin.getDialogueLines())
+            npc_paladin.talkCount++
+            npc_paladin.hasTalked = true
         }
 
         // Reset the flag when player walks away
-        if (!npc.isPlayerNearby(player)) {
-            npc.hasTalked = false
+        if (!npc_paladin.isPlayerNearby(player)) {
+            npc_paladin.hasTalked = false
         }
         //if(Skeleton.readyToSpawn())
         //    skeletonList.add(Skeleton(context, player))
@@ -199,6 +227,10 @@ class Playing4(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN -> {
+                if(event.x > 2000 && event.y < 200){
+                    game.currentGameState = Game.GameState.PAUSE
+                    MusicManager.pauseMusic()
+                }
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

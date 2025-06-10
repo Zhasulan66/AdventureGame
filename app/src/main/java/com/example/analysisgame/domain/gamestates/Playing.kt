@@ -21,6 +21,7 @@ import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.entities.npcs.NPC_Knight
+import com.example.analysisgame.domain.entities.npcs.NPC_farmer
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
@@ -65,8 +66,8 @@ class Playing(
     private val skeletonList = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
 
-    private val npc = NPC_Elder(
-        context = context, imageResId = R.drawable.npc_elder,
+    private val npc_farmer = NPC_farmer(
+        context = context, imageResId = R.drawable.npc_farmer,
         positionX = 3300f, positionY = 3300f,
         player, viewModel, userName
     )
@@ -122,7 +123,7 @@ class Playing(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        npc.draw(canvas, gameDisplay)
+        npc_farmer.draw(canvas, gameDisplay)
         npc_knight.draw(canvas, gameDisplay)
         for (item in items) {
             item.draw(canvas, gameDisplay)
@@ -165,18 +166,32 @@ class Playing(
         joystick.update()
         player.update()
 
-        if (npc.isPlayerNearby(player)
+        if (npc_farmer.isPlayerNearby(player)
             && !dialogueManager.isDialogueActive
-            && !npc.hasTalked
+            && !npc_farmer.hasTalked
         ) {
-            dialogueManager.startDialogue(npc.getDialogueLines())
-            npc.talkCount++
-            npc.hasTalked = true
+            dialogueManager.startDialogue(npc_farmer.getDialogueLines())
+            npc_farmer.talkCount++
+            npc_farmer.hasTalked = true
         }
 
         // Reset the flag when player walks away
-        if (!npc.isPlayerNearby(player)) {
-            npc.hasTalked = false
+        if (!npc_farmer.isPlayerNearby(player)) {
+            npc_farmer.hasTalked = false
+        }
+
+        if (npc_knight.isPlayerNearby(player)
+            && !dialogueManager.isDialogueActive
+            && !npc_knight.hasTalked
+        ) {
+            dialogueManager.startDialogue(npc_knight.getDialogueLines())
+            npc_knight.talkCount++
+            npc_knight.hasTalked = true
+        }
+
+        // Reset the flag when player walks away
+        if (!npc_knight.isPlayerNearby(player)) {
+            npc_knight.hasTalked = false
         }
         /*if(Skeleton.readyToSpawn())
             skeletonList.add(Skeleton(context, player))*/

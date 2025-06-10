@@ -38,7 +38,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun successUserState(username: String){
-        _userState.value = Resource.Success(UserResponse(1, username, "", null, null))
+        _userState.value = Resource.Success(UserResponse(1, username, "", null))
     }
 
 
@@ -53,6 +53,21 @@ class MainViewModel @Inject constructor(
                 _answerState.value = Resource.Success(response)
             } catch (e: Exception) {
                 _answerState.value = Resource.Error(e)
+            }
+        }
+    }
+
+    private val _profileState = MutableStateFlow<Resource<UserResponse>>(Resource.Initial)
+    val profileState: StateFlow<Resource<UserResponse>> = _profileState.asStateFlow()
+
+    fun getUserResult(username: String){
+        viewModelScope.launch {
+            _profileState.value = Resource.Loading
+            try {
+                val response = repository.getUserByUsername(username)
+                _profileState.value = Resource.Success(response)
+            } catch (e: Exception) {
+                _profileState.value = Resource.Error(e)
             }
         }
     }

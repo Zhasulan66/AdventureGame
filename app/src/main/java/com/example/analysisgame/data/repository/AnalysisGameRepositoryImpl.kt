@@ -19,4 +19,8 @@ class AnalysisGameRepositoryImpl(
         return api.createAnswer(answerRequest)
     }
 
+    override suspend fun getUserByUsername(username: String): UserResponse {
+        return api.getUserByUsername(username)
+    }
+
 }

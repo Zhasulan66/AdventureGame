@@ -10,13 +10,16 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.CollectibleItem
 import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.Skeleton
+import com.example.analysisgame.domain.entities.npcs.NPC_elf
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
@@ -63,16 +66,14 @@ class Playing3(
 
     private val skeletonList = ArrayList<Skeleton>()
     private val spellList = ArrayList<Spell>()
-    private val npc = NPC_Elder(
-        context = context,
-        imageResId = R.drawable.npc_elder,
-        positionX = 2200f,
-        positionY = 2200f,
-        player,
-        viewModel,
-        userName
+    private val npc_elf = NPC_elf(
+        context = context, imageResId = R.drawable.npc_elf,
+        positionX = 3400f, positionY = 3650f,
+        player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
+    val items = mutableListOf<CollectibleItem>()
+    private val key_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.key)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -81,6 +82,9 @@ class Playing3(
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
+    init {
+        items.add(CollectibleItem(ItemType.BOOK, key_bitmap, 2100f, 2100f, 15f, 12f))
+    }
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -111,7 +115,7 @@ class Playing3(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        npc.draw(canvas, gameDisplay)
+        npc_elf.draw(canvas, gameDisplay)
 
         // Draw game panels
         joystick.draw(canvas)
@@ -137,18 +141,18 @@ class Playing3(
         joystick.update()
         player.update()
 
-        if (npc.isPlayerNearby(player)
+        if (npc_elf.isPlayerNearby(player)
             && !dialogueManager.isDialogueActive
-            && !npc.hasTalked
+            && !npc_elf.hasTalked
         ) {
-            dialogueManager.startDialogue(npc.getDialogueLines())
-            npc.talkCount++
-            npc.hasTalked = true
+            dialogueManager.startDialogue(npc_elf.getDialogueLines())
+            npc_elf.talkCount++
+            npc_elf.hasTalked = true
         }
 
         // Reset the flag when player walks away
-        if (!npc.isPlayerNearby(player)) {
-            npc.hasTalked = false
+        if (!npc_elf.isPlayerNearby(player)) {
+            npc_elf.hasTalked = false
         }
         //if(Skeleton.readyToSpawn())
         //    skeletonList.add(Skeleton(context, player))

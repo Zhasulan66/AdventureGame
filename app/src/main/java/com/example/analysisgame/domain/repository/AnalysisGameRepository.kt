@@ -11,4 +11,8 @@ interface AnalysisGameRepository {
 
     suspend fun createAnswer(answerRequest: AnswerRequest): AnswerResponse
 
+    suspend fun getUserByUsername(username: String): UserResponse
+
+
+
 }

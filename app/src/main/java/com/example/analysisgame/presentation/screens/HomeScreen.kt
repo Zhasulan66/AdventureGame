@@ -36,7 +36,6 @@ import com.example.analysisgame.domain.model.UserRequest
 import com.example.analysisgame.domain.model.UserResponse
 import com.example.analysisgame.presentation.navigation.Screen
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(navController: NavController) {
@@ -135,7 +134,7 @@ fun UserSuccessScreen(
                     .clip(RoundedCornerShape(10.dp))
                     .background(Color.Cyan)
                     .clickable {
-                        navController.navigate(Screen.ProfileScreen.route)
+                        navController.navigate(Screen.ProfileScreen.route + "/${userResponse.username}")
                     },
                 contentAlignment = Alignment.Center
             ){

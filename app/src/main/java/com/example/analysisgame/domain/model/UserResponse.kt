@@ -5,7 +5,6 @@ data class UserResponse(
     val username: String,
     val registeredAt: String,
     val result: String?,
-    val answers: List<Answer>?,
 )
 /*
 "id": 4,

@@ -10,7 +10,9 @@ import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
+import com.example.analysisgame.domain.entities.CollectibleItem
 import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
 import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
@@ -18,7 +20,9 @@ import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
 import com.example.analysisgame.domain.entities.enemies.BossEnemy
 import com.example.analysisgame.domain.entities.enemies.Skeleton
+import com.example.analysisgame.domain.entities.npcs.NPC_farmer
 import com.example.analysisgame.domain.graphics.Animator
+import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
@@ -60,16 +64,14 @@ class Playing5(
     private val skeletonList = ArrayList<Skeleton>()
     private val bossEnemy = BossEnemy(context, 2600f, 1400f, player, skeletonList)
     private val spellList = ArrayList<Spell>()
-    private val npc = NPC_Elder(
-        context = context,
-        imageResId = R.drawable.npc_elder,
-        positionX = 2200f,
-        positionY = 2200f,
-        player,
-        viewModel,
-        userName
+    private val npc_mage = NPC_Elder(
+        context = context, imageResId = R.drawable.npc_mage,
+        positionX = 2600f, positionY = 1400f,
+        player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
+    val items = mutableListOf<CollectibleItem>()
+    private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -78,6 +80,9 @@ class Playing5(
     private val performance = Performance(context, gameLoop)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
+    init {
+        items.add(CollectibleItem(ItemType.BOOK, potion_bitmap, 2100f, 2100f, 15f, 12f))
+    }
 
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
@@ -112,7 +117,10 @@ class Playing5(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        npc.draw(canvas, gameDisplay)
+        if(bossEnemy.shouldBeRemoved){
+            npc_mage.draw(canvas, gameDisplay)
+        }
+
 
         // Draw game panels
         joystick.draw(canvas)
@@ -124,6 +132,7 @@ class Playing5(
         }
 
         dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
     }
 
     override fun update() {
@@ -139,18 +148,20 @@ class Playing5(
             bossEnemy.update()
         }
 
-        if (npc.isPlayerNearby(player)
-            && !dialogueManager.isDialogueActive
-            && !npc.hasTalked
-        ) {
-            dialogueManager.startDialogue(npc.getDialogueLines())
-            npc.talkCount++
-            npc.hasTalked = true
-        }
+        if(bossEnemy.shouldBeRemoved) {
+            if (npc_mage.isPlayerNearby(player)
+                && !dialogueManager.isDialogueActive
+                && !npc_mage.hasTalked
+            ) {
+                dialogueManager.startDialogue(npc_mage.getDialogueLines())
+                npc_mage.talkCount++
+                npc_mage.hasTalked = true
+            }
 
-        // Reset the flag when player walks away
-        if (!npc.isPlayerNearby(player)) {
-            npc.hasTalked = false
+            // Reset the flag when player walks away
+            if (!npc_mage.isPlayerNearby(player)) {
+                npc_mage.hasTalked = false
+            }
         }
         //if(Skeleton.readyToSpawn())
         //    skeletonList.add(Skeleton(context, player))
@@ -213,6 +224,10 @@ class Playing5(
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN,
             MotionEvent.ACTION_POINTER_DOWN -> {
+                if(event.x > 2000 && event.y < 200){
+                    game.currentGameState = Game.GameState.PAUSE
+                    MusicManager.pauseMusic()
+                }
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

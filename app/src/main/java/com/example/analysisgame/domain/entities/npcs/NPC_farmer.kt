@@ -14,14 +14,14 @@ import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
 
-class NPC_Knight(
-    context: Context,
-    @DrawableRes imageResId: Int,
-    positionX: Float,
-    positionY: Float,
-    private val player: Player,
-    val viewModel: MainViewModel,
-    val userName: String
+class NPC_farmer(
+                 context: Context,
+                 @DrawableRes imageResId: Int,
+                 positionX: Float,
+                 positionY: Float,
+                 private val player: Player,
+                 val viewModel: MainViewModel,
+                 val userName: String
 ) : GameObject(positionX, positionY) {
 
     var hasTalked = false
@@ -63,35 +63,40 @@ class NPC_Knight(
                 DialogueLine("Please, make yourself at home.")
             )
             1 -> listOf(
-                DialogueLine("A bush rustles suddenly. What’s your reaction?", listOf(
-                    DialogueOption("Curious — check it out"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 0))
+                DialogueLine("You’re given a simple quest. How do you respond?", listOf(
+
+                    DialogueOption("Let’s do this!") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 2, 0))
+                        println("Let’s do this!")
                     },
-                    DialogueOption("Cautious — approach slowly"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 1))
+                    DialogueOption("Meh, I guess") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 2, 1))
+                        println("Meh, I guess")
                     },
-                    DialogueOption("Startled — pause or back off"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 2))
+                    DialogueOption("I’ll do it later") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 2, 2))
+                        println("I’ll do it later")
                     },
-                    DialogueOption("Panic — run away"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 4, 3))
-                    },
+                    DialogueOption("Not in the mood at all") {
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 2, 3))
+                        println("Not in the mood at all")
+                    }
                 )),
                 DialogueLine("Farewell.")
             )
             2 -> listOf(
-                DialogueLine("You’re about to enter a mysterious area. What’s your first thought?", listOf(
-                    DialogueOption("Exciting! Let’s go"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 0))
+                DialogueLine("You talk to an NPC with lots of info. What do you do?", listOf(
+                    DialogueOption("Read it all carefully"){
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 3, 0))
                     },
-                    DialogueOption("I’ll go but carefully"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 1))
+                    DialogueOption("Skim the parts"){
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 3, 1))
                     },
-                    DialogueOption("What if something bad happens?"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 2))
+                    DialogueOption("Forget most of it"){
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 3, 2))
                     },
-                    DialogueOption("I’d rather avoid it"){
-                        viewModel.createAnswer(AnswerRequest(userName, 1, 1, 3))
+                    DialogueOption("Skip through everything"){
+                        viewModel.createAnswer(AnswerRequest(userName, 1, 3, 3))
                     },
                 )),
                 DialogueLine("Farewell.")
