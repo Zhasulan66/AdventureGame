@@ -17,4 +17,6 @@
     <color name="healthBarHealth">#8BC34A</color>
     <color name="healthBarBoss">#800909</color>
     <color name="gameOver">#DD0F00</color>
+
+    <color name="darkYellow">#6A6500</color>
 </resources>
