@@ -18,6 +18,9 @@ class Skeleton(
     private val player: Player,
     val x: Float,
     val y: Float,
+    val isInvencible: Boolean = false,
+    val directionChar: Char = 'x', //'y'
+    val distance: Float = 0f
 ) :
     Circle(
         context,
@@ -58,39 +61,43 @@ class Skeleton(
 
 
     override fun update() {
-        // =========================================================================================
-        //   Update velocity of the enemy so that the velocity is in the direction of the player
-        // =========================================================================================
-        // Calculate vector from enemy to player (in x and y)
-        val distanceToPlayerX: Float = player.positionX - positionX
-        val distanceToPlayerY: Float = player.positionY - positionY
+        if (isInvencible){
+            backAndForthMovement()
+        }else {
+            // =========================================================================================
+            //   Update velocity of the enemy so that the velocity is in the direction of the player
+            // =========================================================================================
+            // Calculate vector from enemy to player (in x and y)
+            val distanceToPlayerX: Float = player.positionX - positionX
+            val distanceToPlayerY: Float = player.positionY - positionY
 
-        // Calculate (absolute) distance between enemy (this) and player
-        val distanceToPlayer = getDistanceBetweenObjects(
-            this,
-            player
-        )
+            // Calculate (absolute) distance between enemy (this) and player
+            val distanceToPlayer = getDistanceBetweenObjects(
+                this,
+                player
+            )
 
-        // Calculate direction from enemy to player
-        directionX = distanceToPlayerX / distanceToPlayer
-        directionY = distanceToPlayerY / distanceToPlayer
+            // Calculate direction from enemy to player
+            directionX = distanceToPlayerX / distanceToPlayer
+            directionY = distanceToPlayerY / distanceToPlayer
 
-        // Set velocity in the direction to the player
-        if (distanceToPlayer > 0) { // Avoid division by zero
-            velocityX = (directionX * MAX_SPEED).toFloat()
-            velocityY = (directionY * MAX_SPEED).toFloat()
-        } else {
-            velocityX = 0f
-            velocityY = 0f
+            // Set velocity in the direction to the player
+            if (distanceToPlayer > 0) { // Avoid division by zero
+                velocityX = (directionX * MAX_SPEED).toFloat()
+                velocityY = (directionY * MAX_SPEED).toFloat()
+            } else {
+                velocityX = 0f
+                velocityY = 0f
+            }
+
+            // =========================================================================================
+            //   Update position of the enemy
+            // =========================================================================================
+            positionX += velocityX
+            positionY += velocityY
+
+            animator.updateAnimation(this)
         }
-
-        // =========================================================================================
-        //   Update position of the enemy
-        // =========================================================================================
-        positionX += velocityX
-        positionY += velocityY
-
-        animator.updateAnimation(this)
     }
 
     override fun draw(canvas: Canvas, gameDisplay: GameDisplay) {
@@ -105,6 +112,36 @@ class Skeleton(
     fun isPlayerNearby(player: Player): Boolean {
         val distance = getDistanceBetweenObjects(this, player)
         return distance < 500
+    }
+
+    private var patrolStartX = x
+    private var patrolStartY = y
+    private var patrolDirection = 1  // 1 or -1
+    private var isPatrollingX = true
+
+    fun backAndForthMovement() {
+        directionX = patrolDirection.toFloat()
+        velocityX = 1f
+        isPatrollingX = directionChar == 'x'
+
+        val maxOffset = distance
+        val speed = (MAX_SPEED * patrolDirection).toFloat()
+
+        if (isPatrollingX) {
+            positionX += speed
+            val offset = positionX - patrolStartX
+            if (kotlin.math.abs(offset) >= maxOffset) {
+                patrolDirection *= -1 // reverse direction
+            }
+        } else {
+            positionY += speed
+            val offset = positionY - patrolStartY
+            if (kotlin.math.abs(offset) >= maxOffset) {
+                patrolDirection *= -1 // reverse direction
+            }
+        }
+
+        animator.updateAnimation(this)
     }
 
 

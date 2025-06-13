@@ -78,6 +78,9 @@ class Playing3(
     private val key_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.key)
     private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
+    private var lastSpellCastTime = System.currentTimeMillis()
+    private val spellCooldown = 500L // milliseconds (2 spells/second)
+
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
@@ -87,6 +90,8 @@ class Playing3(
     var isPoisonDamageTaken2 = false
 
     private val gameOver = GameOverView(context, game)
+    private var gameOverStartTime = 0L
+    private var isGameOverSoundPlayed = false
     private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
@@ -96,7 +101,7 @@ class Playing3(
     init {
         items.add(CollectibleItem(ItemType.KEY, key_bitmap, 196f, 250f, 24f, 14f))
         items.add(CollectibleItem(ItemType.KEY, key_bitmap, 1829f, 3165f, 24f, 14f))
-        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 3972f, 1313f, 24f, 14f))
+        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 2972f, 1313f, 24f, 14f))
 
         items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 1255f, 3660f, 16f, 21f))
         items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3714f, 3680f, 16f, 21f))
@@ -104,8 +109,11 @@ class Playing3(
         items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3198f, 3276f, 16f, 21f))
         items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3246f, 2250f, 16f, 21f))
 
-        skeletonList.add(Skeleton(context, player, 2608f, 1628f))
-        skeletonList.add(Skeleton(context, player, 2608f, 1640f))
+        skeletonList.add(Skeleton(context, player, 480f, 880f, true, 'x', 370f))
+        skeletonList.add(Skeleton(context, player, 2214f, 3243f, true, 'y', 450f))
+        skeletonList.add(Skeleton(context, player, 2531f, 2683f, true, 'y', 475f))
+        skeletonList.add(Skeleton(context, player, 2786f, 986f, true, 'x', 250f))
+        skeletonList.add(Skeleton(context, player, 2307f, 175f, true, 'x', 920f))
     }
 
     override fun render(canvas: Canvas) {
@@ -168,8 +176,21 @@ class Playing3(
 
         // Stop updating the game if the player is dead
         if (player.getHealthPoints() <= 0) {
-            MusicManager.stopMusic()
-            return
+            // Play Game Over sound only once
+            if (!isGameOverSoundPlayed) {
+                isGameOverSoundPlayed = true
+                MusicManager.stopMusic()
+                SoundEffectsManager.playGameOver()
+                gameOverStartTime = System.currentTimeMillis()
+            }
+
+            // Wait 2 second, then go to Game Over state
+            if (System.currentTimeMillis() - gameOverStartTime > 2000) {
+                //game.currentGameState = Game.GameState.MENU // or GAME_OVER
+                SoundEffectsManager.release()
+            }
+
+            return // Stop the rest of the update
         }
 
         joystick.update()
@@ -200,10 +221,12 @@ class Playing3(
         if((player.positionX > 3260f && player.positionX < 3280f) && (player.positionY > 2576f && player.positionY < 2783f) && !isPoisonDamageTaken1){
             player.setHealthPoints(player.getHealthPoints()-1)
             isPoisonDamageTaken1 = true
+            SoundEffectsManager.playDamage()
         }
         if((player.positionX > 2420f && player.positionX < 2480f) && (player.positionY > 97f && player.positionY < 220f) && !isPoisonDamageTaken2){
             player.setHealthPoints(player.getHealthPoints()-1)
             isPoisonDamageTaken2 = true
+            SoundEffectsManager.playDamage()
         }
 
         for (item in items) {
@@ -248,10 +271,12 @@ class Playing3(
             if (Circle.isColliding(skeleton, player)) {
                 iteratorSkeleton.remove()
                 player.setHealthPoints((player.getHealthPoints() - 1))
+                SoundEffectsManager.playDamage()
                 continue
             }
 
-            val iteratorSpell = spellList.iterator()
+            //Invincible skeletons here
+            /*val iteratorSpell = spellList.iterator()
             while (iteratorSpell.hasNext()) {
                 val spell = iteratorSpell.next()
                 if (Circle.isColliding(spell, skeleton)) {
@@ -259,7 +284,7 @@ class Playing3(
                     iteratorSkeleton.remove()
                     break
                 }
-            }
+            }*/
         }
 
         // Update gameDisplay so that it's center is set to the new center of the player's
@@ -289,13 +314,23 @@ class Playing3(
 
                 dialogueManager.handleTouch(event.x, event.y)
 
+                val currentTime = System.currentTimeMillis()
+
                 if (joystick.isPressed) {
-                    numberOfSpellToCast++
+                    if (currentTime - lastSpellCastTime >= spellCooldown) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 } else if (joystick.isPressed(event.x, event.y)) {
                     joystickPointerId = event.getPointerId(event.actionIndex)
                     joystick.isPressed = true
                 } else {
-                    numberOfSpellToCast++
+                    if (currentTime - lastSpellCastTime >= spellCooldown) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 }
             }
 

@@ -12,6 +12,7 @@ import com.example.analysisgame.domain.entities.BossHealthBar
 import com.example.analysisgame.domain.entities.BossSpell
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.Player
+import com.example.analysisgame.domain.gamestates.SoundEffectsManager
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 
@@ -88,6 +89,7 @@ class BossEnemy(
             if (isColliding(spell, player)) {
                 iterator.remove()
                 player.setHealthPoints((player.getHealthPoints() - 1))
+                SoundEffectsManager.playDamage()
                 continue
             }
         }

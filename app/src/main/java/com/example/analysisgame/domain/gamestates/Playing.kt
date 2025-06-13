@@ -30,7 +30,6 @@ import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
-import kotlin.random.Random
 
 class Playing(
     val game: Game,
@@ -79,6 +78,9 @@ class Playing(
 
     val items = mutableListOf<CollectibleItem>()
     private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
+
+    private var lastSpellCastTime = System.currentTimeMillis()
+    private val spellCooldown = 500L // milliseconds (2 spells/second)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
@@ -290,15 +292,23 @@ class Playing(
 
                 dialogueManager.handleTouch(event.x, event.y)
 
+                val currentTime = System.currentTimeMillis()
+
                 if (joystick.isPressed) {
-                    if(isBookTaken) numberOfSpellToCast++
-                    SoundEffectsManager.playFireball()
+                    if (currentTime - lastSpellCastTime >= spellCooldown && isBookTaken) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 } else if (joystick.isPressed(event.x, event.y)) {
                     joystickPointerId = event.getPointerId(event.actionIndex)
                     joystick.isPressed = true
                 } else {
-                    if(isBookTaken) numberOfSpellToCast++
-                    SoundEffectsManager.playFireball()
+                    if (currentTime - lastSpellCastTime >= spellCooldown && isBookTaken) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 }
                 //return true
             }

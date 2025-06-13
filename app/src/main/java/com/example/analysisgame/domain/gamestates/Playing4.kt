@@ -77,6 +77,9 @@ class Playing4(
     val items = mutableListOf<CollectibleItem>()
     private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
+    private var lastSpellCastTime = System.currentTimeMillis()
+    private val spellCooldown = 500L // milliseconds (2 spells/second)
+
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
@@ -85,6 +88,8 @@ class Playing4(
     var enemyToSpawn = 30
 
     private val gameOver = GameOverView(context, game)
+    private var gameOverStartTime = 0L
+    private var isGameOverSoundPlayed = false
     private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
@@ -144,7 +149,7 @@ class Playing4(
         }
 
         // Draw Game Win if the player wins
-        if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
+        if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 3 && !npc_paladin.hasTalked) {
             gameWinScreen.draw(canvas)
         }
     }
@@ -153,7 +158,21 @@ class Playing4(
 
         // Stop updating the game if the player is dead
         if (player.getHealthPoints() <= 0) {
-            return
+            // Play Game Over sound only once
+            if (!isGameOverSoundPlayed) {
+                isGameOverSoundPlayed = true
+                MusicManager.stopMusic()
+                SoundEffectsManager.playGameOver()
+                gameOverStartTime = System.currentTimeMillis()
+            }
+
+            // Wait 2 second, then go to Game Over state
+            if (System.currentTimeMillis() - gameOverStartTime > 2000) {
+                //game.currentGameState = Game.GameState.MENU // or GAME_OVER
+                SoundEffectsManager.release()
+            }
+
+            return // Stop the rest of the update
         }
 
         joystick.update()
@@ -241,6 +260,7 @@ class Playing4(
             if (Circle.isColliding(skeleton, player)) {
                 iteratorSkeleton.remove()
                 player.setHealthPoints((player.getHealthPoints() - 1))
+                SoundEffectsManager.playDamage()
                 continue
             }
 
@@ -275,19 +295,29 @@ class Playing4(
                     gameOver.onTouchEvent(event)
                 }
 
-                if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
+                if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 3 && !npc_paladin.hasTalked) {
                     gameWinScreen.onTouchEvent(event)
                 }
 
                 dialogueManager.handleTouch(event.x, event.y)
 
+                val currentTime = System.currentTimeMillis()
+
                 if (joystick.isPressed) {
-                    numberOfSpellToCast++
+                    if (currentTime - lastSpellCastTime >= spellCooldown) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 } else if (joystick.isPressed(event.x, event.y)) {
                     joystickPointerId = event.getPointerId(event.actionIndex)
                     joystick.isPressed = true
                 } else {
-                    numberOfSpellToCast++
+                    if (currentTime - lastSpellCastTime >= spellCooldown) {
+                        numberOfSpellToCast++
+                        lastSpellCastTime = currentTime
+                        SoundEffectsManager.playFireball()
+                    }
                 }
             }
 

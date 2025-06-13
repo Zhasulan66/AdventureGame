@@ -16,10 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
 import com.example.analysisgame.domain.gamestates.MusicManager
+import com.example.analysisgame.domain.gamestates.SettingsManager
 import com.example.analysisgame.presentation.navigation.Navigation
 import com.example.analysisgame.presentation.ui.theme.AnalysisGameTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -46,6 +49,10 @@ class MainActivity : ComponentActivity() {
         GAME_WIDTH = dm.widthPixels
         GAME_HEIGHT = dm.heightPixels
 
+        // Load settings ONCE when app starts
+        lifecycleScope.launch {
+            SettingsManager.loadSettings(applicationContext)
+        }
 
         //enableEdgeToEdge()
         setContent {

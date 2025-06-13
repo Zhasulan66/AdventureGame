@@ -9,6 +9,9 @@ import androidx.navigation.NavController
 import com.example.analysisgame.R
 import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.navigation.Screen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PauseScreen(val game: Game, val navController: NavController) : BaseState(game), GameStateInterface {
     val alpha1 = Color.argb(120, 0, 0, 0)
@@ -109,20 +112,26 @@ class PauseScreen(val game: Game, val navController: NavController) : BaseState(
 
             if(music_btn.contains(event.x, event.y)){
                 SettingsManager.isMusicOn = !SettingsManager.isMusicOn
+                CoroutineScope(Dispatchers.IO).launch {
+                    SettingsManager.saveSettings(game.context)
+                }
                 if (SettingsManager.isMusicOn) {
                     when(game.currentLevel){
                         1 -> MusicManager.startMusic(game.context, R.raw.disco_dj)
                         2 -> MusicManager.startMusic(game.context, R.raw.disco_dj)
                         3 -> MusicManager.startMusic(game.context, R.raw.penacony_dark)
                         4 -> MusicManager.startMusic(game.context, R.raw.disco_dj)
-                        5 -> MusicManager.startMusic(game.context, R.raw.disco_dj)
+                        5 -> MusicManager.startMusic(game.context, R.raw.hard_drive)
                     }
                 } else {
                     MusicManager.stopMusic()
                 }
             }
-            if(sound_btn.contains(event.x, event.y)){
+            if (sound_btn.contains(event.x, event.y)) {
                 SettingsManager.isSoundOn = !SettingsManager.isSoundOn
+                CoroutineScope(Dispatchers.IO).launch {
+                    SettingsManager.saveSettings(game.context)
+                }
             }
         }
     }
