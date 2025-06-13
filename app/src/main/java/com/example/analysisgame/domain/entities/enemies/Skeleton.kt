@@ -39,7 +39,7 @@ class Skeleton(
     companion object {
         private val SPEED_PIXELS_PER_SECOND: Double = Player.SPEED_PIXELS_PER_SECOND * 0.6
         private val MAX_SPEED = SPEED_PIXELS_PER_SECOND / GameLoop.MAX_UPS
-        private val SPAWNS_PER_MINUTE = 20.0
+        private val SPAWNS_PER_MINUTE = 60.0
         private val SPAWNS_PER_SECOND = SPAWNS_PER_MINUTE/60
         private val UPDATES_PER_SPAWN = GameLoop.MAX_UPS/SPAWNS_PER_SECOND
         private var updatesUnitNextSpawn = UPDATES_PER_SPAWN
@@ -100,6 +100,11 @@ class Skeleton(
             gameDisplay = gameDisplay,
             this
         )
+    }
+
+    fun isPlayerNearby(player: Player): Boolean {
+        val distance = getDistanceBetweenObjects(this, player)
+        return distance < 500
     }
 
 

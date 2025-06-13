@@ -5,20 +5,19 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 import android.view.MotionEvent
 import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.CollectibleItem
-import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.GameOverView
 import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
+import com.example.analysisgame.domain.entities.WinScreenView
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.entities.npcs.NPC_Knight
 import com.example.analysisgame.domain.entities.npcs.NPC_farmer
@@ -31,6 +30,7 @@ import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
+import kotlin.random.Random
 
 class Playing(
     val game: Game,
@@ -39,7 +39,6 @@ class Playing(
     userName: String,
     viewModel: MainViewModel
 ) : BaseState(game), GameStateInterface {
-
 
     //private var gameLoop = GameLoop(this, surfaceHolder = holder)
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
@@ -84,10 +83,13 @@ class Playing(
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val gameOver = GameOver(context)
+    private val gameWinScreen = WinScreenView(context, game)
+    var isBookTaken = false
+
+    private val gameOver = GameOverView(context, game)
     private var gameOverStartTime = 0L
     private var isGameOverSoundPlayed = false
-    private val performance = Performance(context, gameLoop)
+    private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
     init {
@@ -133,14 +135,20 @@ class Playing(
         joystick.draw(canvas)
         performance.draw(canvas)
 
+        dialogueManager.draw(canvas)
+
+        drawPauseButton(canvas)
+
         // Draw Game over if the player is dead
         if (player.getHealthPoints() <= 0) {
             gameOver.draw(canvas)
         }
 
-        dialogueManager.draw(canvas)
-
-        drawPauseButton(canvas)
+        // Draw Game Win if the player wins
+        if (isBookTaken && npc_farmer.talkCount >=2
+            && npc_knight.talkCount >= 2 && player.positionX > 3200f && player.positionY < 500f) {
+            gameWinScreen.draw(canvas)
+        }
     }
 
     override fun update() {
@@ -193,8 +201,6 @@ class Playing(
         if (!npc_knight.isPlayerNearby(player)) {
             npc_knight.hasTalked = false
         }
-        /*if(Skeleton.readyToSpawn())
-            skeletonList.add(Skeleton(context, player))*/
 
         for (skeleton in skeletonList)
             skeleton.update()
@@ -209,7 +215,11 @@ class Playing(
         for (item in items) {
             if (item.checkCollisionWithPlayer(player)) {
                 when (item.type) {
-                    ItemType.BOOK -> { /* collect book */ }
+                    ItemType.BOOK -> {
+                        /* collect book */
+                        isBookTaken = true
+
+                    }
                     ItemType.KEY -> { /* unlock door */ }
                     ItemType.HEALTH_POTION -> {
 
@@ -268,17 +278,26 @@ class Playing(
                     game.currentGameState = Game.GameState.PAUSE
                     MusicManager.pauseMusic()
                 }
+                if(player.getHealthPoints() >= 0){
+                    gameOver.onTouchEvent(event)
+                }
+
+                if (isBookTaken && npc_farmer.talkCount >=2
+                    && npc_knight.talkCount >= 2 && player.positionX > 3200f && player.positionY < 500f) {
+                    gameWinScreen.onTouchEvent(event)
+                }
+
 
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {
-                    numberOfSpellToCast++
+                    if(isBookTaken) numberOfSpellToCast++
                     SoundEffectsManager.playFireball()
                 } else if (joystick.isPressed(event.x, event.y)) {
                     joystickPointerId = event.getPointerId(event.actionIndex)
                     joystick.isPressed = true
                 } else {
-                    numberOfSpellToCast++
+                    if(isBookTaken) numberOfSpellToCast++
                     SoundEffectsManager.playFireball()
                 }
                 //return true

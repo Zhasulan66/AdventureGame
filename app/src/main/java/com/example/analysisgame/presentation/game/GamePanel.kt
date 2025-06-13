@@ -40,7 +40,7 @@ class GamePanel(
             2 -> MusicManager.startMusic(context, R.raw.disco_dj)
             3 -> MusicManager.startMusic(context, R.raw.penacony_dark)
             4 -> MusicManager.startMusic(context, R.raw.disco_dj)
-            5 -> MusicManager.startMusic(context, R.raw.disco_dj)
+            5 -> MusicManager.startMusic(context, R.raw.hard_drive)
         }
         game.startGameLoop()
     }

@@ -265,5 +265,10 @@ class BossEnemy(
         skeletonList.add(Skeleton(context, player, positionX + 50f, positionY))
         skeletonList.add(Skeleton(context, player, positionX - 50f, positionY))
     }
+
+    fun isPlayerNearby(player: Player): Boolean {
+        val distance = getDistanceBetweenObjects(this, player)
+        return distance < 1000
+    }
 }
 

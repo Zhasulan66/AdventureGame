@@ -11,17 +11,15 @@ import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.CollectibleItem
-import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.GameOverView
 import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
+import com.example.analysisgame.domain.entities.WinScreenView
 import com.example.analysisgame.domain.entities.enemies.Skeleton
-import com.example.analysisgame.domain.entities.npcs.NPC_Knight
 import com.example.analysisgame.domain.entities.npcs.NPC_archer
-import com.example.analysisgame.domain.entities.npcs.NPC_farmer
 import com.example.analysisgame.domain.entities.npcs.NPC_paladin
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
@@ -77,17 +75,24 @@ class Playing4(
     )
     val dialogueManager = DialogueManager()
     val items = mutableListOf<CollectibleItem>()
-    private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
+    private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val gameOver = GameOver(context)
-    private val performance = Performance(context, gameLoop)
+    private val gameWinScreen = WinScreenView(context, game)
+    var enemyDefeatedCount = 0
+    var enemyToSpawn = 30
+
+    private val gameOver = GameOverView(context, game)
+    private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
     init {
-        items.add(CollectibleItem(ItemType.BOOK, book_bitmap, 2100f, 2100f, 15f, 12f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 1284f, 3169f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 2477f, 3765f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 2559f, 1751f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3512f, 484f, 16f, 21f))
     }
 
     override fun render(canvas: Canvas) {
@@ -122,17 +127,26 @@ class Playing4(
         npc_archer.draw(canvas, gameDisplay)
         npc_paladin.draw(canvas, gameDisplay)
 
+        for (item in items) {
+            item.draw(canvas, gameDisplay)
+        }
+
         // Draw game panels
         joystick.draw(canvas)
         performance.draw(canvas)
+
+        dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
 
         // Draw Game over if the player is dead
         if (player.getHealthPoints() <= 0) {
             gameOver.draw(canvas)
         }
 
-        dialogueManager.draw(canvas)
-        drawPauseButton(canvas)
+        // Draw Game Win if the player wins
+        if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
+            gameWinScreen.draw(canvas)
+        }
     }
 
     override fun update() {
@@ -171,11 +185,35 @@ class Playing4(
         if (!npc_paladin.isPlayerNearby(player)) {
             npc_paladin.hasTalked = false
         }
-        //if(Skeleton.readyToSpawn())
-        //    skeletonList.add(Skeleton(context, player))
+
+        if(Skeleton.readyToSpawn() && enemyToSpawn > 0 && npc_archer.talkCount > 2) {
+            skeletonList.add(
+                Skeleton(
+                    context, player,
+                    (300..2500).random().toFloat(), (300..2500).random().toFloat()
+                )
+            )
+            enemyToSpawn--
+        }
 
         for (skeleton in skeletonList)
             skeleton.update()
+
+        for (item in items) {
+            if (item.checkCollisionWithPlayer(player)) {
+                when (item.type) {
+                    ItemType.BOOK -> {/* collect book */ }
+                    ItemType.KEY -> {  }
+                    ItemType.HEALTH_POTION -> {
+                        if(player.getHealthPoints() < 5){
+                            player.setHealthPoints(player.getHealthPoints()+1)
+                        }
+                    }
+                }
+                items.remove(item) // or mark as collected
+                break // avoid ConcurrentModificationException
+            }
+        }
 
         // Update states of all spells
         while (numberOfSpellToCast > 0) {
@@ -212,6 +250,7 @@ class Playing4(
                 if (Circle.isColliding(spell, skeleton)) {
                     iteratorSpell.remove()
                     iteratorSkeleton.remove()
+                    enemyDefeatedCount++
                     break
                 }
             }
@@ -231,6 +270,15 @@ class Playing4(
                     game.currentGameState = Game.GameState.PAUSE
                     MusicManager.pauseMusic()
                 }
+
+                if(player.getHealthPoints() >= 0){
+                    gameOver.onTouchEvent(event)
+                }
+
+                if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
+                    gameWinScreen.onTouchEvent(event)
+                }
+
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

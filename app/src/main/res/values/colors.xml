@@ -19,4 +19,5 @@
     <color name="gameOver">#DD0F00</color>
 
     <color name="darkYellow">#6A6500</color>
+    <color name="darkGreen">#FF4CAF50</color>
 </resources>

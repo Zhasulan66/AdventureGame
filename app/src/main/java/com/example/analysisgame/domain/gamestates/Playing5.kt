@@ -11,16 +11,16 @@ import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.CollectibleItem
-import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.GameOverView
 import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
+import com.example.analysisgame.domain.entities.WinScreenView
 import com.example.analysisgame.domain.entities.enemies.BossEnemy
 import com.example.analysisgame.domain.entities.enemies.Skeleton
-import com.example.analysisgame.domain.entities.npcs.NPC_farmer
+import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
@@ -76,12 +76,18 @@ class Playing5(
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val gameOver = GameOver(context)
-    private val performance = Performance(context, gameLoop)
+    private val gameWinScreen = WinScreenView(context, game)
+    var enemyDown = 0
+
+    private val gameOver = GameOverView(context, game)
+    private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
     init {
-        items.add(CollectibleItem(ItemType.BOOK, potion_bitmap, 2100f, 2100f, 15f, 12f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3413f, 3191f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3358f, 1070f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 2488f, 470f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 407f, 544f, 16f, 21f))
     }
 
     override fun render(canvas: Canvas) {
@@ -126,13 +132,18 @@ class Playing5(
         joystick.draw(canvas)
         performance.draw(canvas)
 
+        dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
+
         // Draw Game over if the player is dead
         if (player.getHealthPoints() <= 0) {
             gameOver.draw(canvas)
         }
 
-        dialogueManager.draw(canvas)
-        drawPauseButton(canvas)
+        // Draw Game Win if the player wins
+        if (npc_mage.talkCount >= 4 && !npc_mage.hasTalked) {
+            gameWinScreen.draw(canvas)
+        }
     }
 
     override fun update() {
@@ -144,7 +155,7 @@ class Playing5(
 
         joystick.update()
         player.update()
-        if (!bossEnemy.shouldBeRemoved) {
+        if (!bossEnemy.shouldBeRemoved && bossEnemy.isPlayerNearby(player)) {
             bossEnemy.update()
         }
 
@@ -228,6 +239,15 @@ class Playing5(
                     game.currentGameState = Game.GameState.PAUSE
                     MusicManager.pauseMusic()
                 }
+
+                if(player.getHealthPoints() >= 0){
+                    gameOver.onTouchEvent(event)
+                }
+
+                if (npc_mage.talkCount >= 4 && !npc_mage.hasTalked) {
+                    gameWinScreen.onTouchEvent(event)
+                }
+
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

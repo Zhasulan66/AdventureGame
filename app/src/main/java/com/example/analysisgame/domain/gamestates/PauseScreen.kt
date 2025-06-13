@@ -100,6 +100,7 @@ class PauseScreen(val game: Game, val navController: NavController) : BaseState(
                 MusicManager.stopMusic()
                 SoundEffectsManager.release()
                 //game.currentGameState = Game.GameState.MENU
+                game.pauseGameLoop()
                 navController.navigate(Screen.HomeScreen.route){
                     popUpTo(0)
                     launchSingleTop = true

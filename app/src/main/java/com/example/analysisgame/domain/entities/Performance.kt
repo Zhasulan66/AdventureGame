@@ -8,12 +8,14 @@ import com.example.analysisgame.presentation.game.GameLoop
 
 class Performance(
     val context: Context,
-    val gameLoop: GameLoop
+    val gameLoop: GameLoop,
+    val player: Player
 ) {
 
     fun draw(canvas: Canvas){
-        drawUPS(canvas)
+        //drawUPS(canvas)
         drawFPS(canvas)
+        drawCoordinates(canvas)
     }
 
     private fun drawUPS(canvas: Canvas){
@@ -27,6 +29,13 @@ class Performance(
         val averageFPS = gameLoop.getAverageFPS().toString()
         val paint = Paint().apply { color = Color.BLUE
             textSize = 50f}
-        canvas.drawText("FPS: $averageFPS", 100f, 200f, paint)
+        canvas.drawText("FPS: $averageFPS", 100f, 100f, paint)
+    }
+
+    private fun drawCoordinates(canvas: Canvas){
+        val coordinates = "x: ${player.positionX}\n y: ${player.positionY}"
+        val paint = Paint().apply { color = Color.BLUE
+            textSize = 50f}
+        canvas.drawText(coordinates, 100f, 150f, paint)
     }
 }

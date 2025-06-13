@@ -5,19 +5,23 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.view.MotionEvent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import com.example.analysisgame.MainActivity.Companion.GAME_HEIGHT
 import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.CollectibleItem
-import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.GameOverView
 import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
+import com.example.analysisgame.domain.entities.WinScreenView
 import com.example.analysisgame.domain.entities.enemies.Skeleton
 import com.example.analysisgame.domain.entities.npcs.NPC_elf
 import com.example.analysisgame.domain.graphics.Animator
@@ -29,6 +33,7 @@ import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
 import com.example.analysisgame.presentation.viewmodel.MainViewModel
+import kotlinx.coroutines.flow.asFlow
 
 
 class Playing3(
@@ -38,10 +43,6 @@ class Playing3(
     userName: String,
     viewModel: MainViewModel
 ) : BaseState(game), GameStateInterface {
-
-    /*init {
-        MusicManager.startMusic(context, R.raw.penacony_dark)
-    }*/
 
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
 
@@ -68,22 +69,43 @@ class Playing3(
     private val spellList = ArrayList<Spell>()
     private val npc_elf = NPC_elf(
         context = context, imageResId = R.drawable.npc_elf,
-        positionX = 3400f, positionY = 3650f,
+        positionX = 1317f,
+        positionY = 2158f,
         player, viewModel, userName
     )
     val dialogueManager = DialogueManager()
     val items = mutableListOf<CollectibleItem>()
     private val key_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.key)
+    private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val gameOver = GameOver(context)
-    private val performance = Performance(context, gameLoop)
+    private val gameWinScreen = WinScreenView(context, game)
+    var keyCount = 0
+    var isPoisonDamageTaken1 = false
+    var isPoisonDamageTaken2 = false
+
+    private val gameOver = GameOverView(context, game)
+    private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
+    val paint = Paint().apply { color = Color.BLUE
+        textSize = 50f}
+
     init {
-        items.add(CollectibleItem(ItemType.BOOK, key_bitmap, 2100f, 2100f, 15f, 12f))
+        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 196f, 250f, 24f, 14f))
+        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 1829f, 3165f, 24f, 14f))
+        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 3972f, 1313f, 24f, 14f))
+
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 1255f, 3660f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3714f, 3680f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3639f, 1391f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3198f, 3276f, 16f, 21f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 3246f, 2250f, 16f, 21f))
+
+        skeletonList.add(Skeleton(context, player, 2608f, 1628f))
+        skeletonList.add(Skeleton(context, player, 2608f, 1640f))
     }
 
     override fun render(canvas: Canvas) {
@@ -117,17 +139,29 @@ class Playing3(
 
         npc_elf.draw(canvas, gameDisplay)
 
+        for (item in items) {
+            item.draw(canvas, gameDisplay)
+        }
+
         // Draw game panels
         joystick.draw(canvas)
         performance.draw(canvas)
+        canvas.drawText("Keys X${keyCount}", 1900f, 1000f, paint)
+
+        dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
 
         // Draw Game over if the player is dead
         if (player.getHealthPoints() <= 0) {
             gameOver.draw(canvas)
         }
 
-        dialogueManager.draw(canvas)
-        drawPauseButton(canvas)
+        // Draw Game Win if the player wins
+        if (keyCount == 3 && npc_elf.talkCount >= 4
+            && (player.positionX > 3700f && player.positionX < 3750f)
+            && (player.positionY > 990f && player.positionY < 1111f)) {
+            gameWinScreen.draw(canvas)
+        }
     }
 
     override fun update() {
@@ -154,11 +188,39 @@ class Playing3(
         if (!npc_elf.isPlayerNearby(player)) {
             npc_elf.hasTalked = false
         }
-        //if(Skeleton.readyToSpawn())
-        //    skeletonList.add(Skeleton(context, player))
+        if(npc_elf.talkCount > 2 && !npc_elf.hasTalked){
+            npc_elf.positionX = 3612f
+            npc_elf.positionY = 160f
+        }
 
         for (skeleton in skeletonList)
             skeleton.update()
+
+        //Spilled poison damage
+        if((player.positionX > 3260f && player.positionX < 3280f) && (player.positionY > 2576f && player.positionY < 2783f) && !isPoisonDamageTaken1){
+            player.setHealthPoints(player.getHealthPoints()-1)
+            isPoisonDamageTaken1 = true
+        }
+        if((player.positionX > 2420f && player.positionX < 2480f) && (player.positionY > 97f && player.positionY < 220f) && !isPoisonDamageTaken2){
+            player.setHealthPoints(player.getHealthPoints()-1)
+            isPoisonDamageTaken2 = true
+        }
+
+        for (item in items) {
+            if (item.checkCollisionWithPlayer(player)) {
+                when (item.type) {
+                    ItemType.BOOK -> {/* collect book */ }
+                    ItemType.KEY -> { keyCount += 1 }
+                    ItemType.HEALTH_POTION -> {
+                        if(player.getHealthPoints() < 5){
+                            player.setHealthPoints(player.getHealthPoints()+1)
+                        }
+                    }
+                }
+                items.remove(item) // or mark as collected
+                break // avoid ConcurrentModificationException
+            }
+        }
 
         // Update states of all spells
         while (numberOfSpellToCast > 0) {
@@ -214,6 +276,17 @@ class Playing3(
                     game.currentGameState = Game.GameState.PAUSE
                     MusicManager.pauseMusic()
                 }
+
+                if(player.getHealthPoints() >= 0){
+                    gameOver.onTouchEvent(event)
+                }
+
+                if (keyCount == 3 && npc_elf.talkCount >= 4
+                    && (player.positionX > 3700f && player.positionX < 3750f)
+                    && (player.positionY > 990f && player.positionY < 1111f)) {
+                    gameWinScreen.onTouchEvent(event)
+                }
+
                 dialogueManager.handleTouch(event.x, event.y)
 
                 if (joystick.isPressed) {

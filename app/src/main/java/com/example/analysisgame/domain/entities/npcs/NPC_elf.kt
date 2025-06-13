@@ -59,8 +59,8 @@ class NPC_elf(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
+                DialogueLine("Hello traveler! You have to find 3 keys to escape the Maze"),
+                DialogueLine("Be careful, skeletons don't die from magic here")
             )
             1 -> listOf(
                 DialogueLine("An NPC gives you vague instructions. How do you feel?", listOf(

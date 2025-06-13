@@ -11,15 +11,14 @@ import com.example.analysisgame.MainActivity.Companion.GAME_WIDTH
 import com.example.analysisgame.R
 import com.example.analysisgame.domain.entities.Circle
 import com.example.analysisgame.domain.entities.CollectibleItem
-import com.example.analysisgame.domain.entities.GameOver
+import com.example.analysisgame.domain.entities.GameOverView
 import com.example.analysisgame.domain.entities.ItemType
 import com.example.analysisgame.domain.entities.Joystick
-import com.example.analysisgame.domain.entities.npcs.NPC_Elder
 import com.example.analysisgame.domain.entities.Performance
 import com.example.analysisgame.domain.entities.Player
 import com.example.analysisgame.domain.entities.Spell
+import com.example.analysisgame.domain.entities.WinScreenView
 import com.example.analysisgame.domain.entities.enemies.Skeleton
-import com.example.analysisgame.domain.entities.npcs.NPC_farmer
 import com.example.analysisgame.domain.entities.npcs.NPC_hunter
 import com.example.analysisgame.domain.graphics.Animator
 import com.example.analysisgame.domain.graphics.drawPauseButton
@@ -70,17 +69,33 @@ class Playing2(
     )
     val dialogueManager = DialogueManager()
     val items = mutableListOf<CollectibleItem>()
-    private val book_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.book)
+    private val key_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.key)
+    private val potion_bitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.health_potion)
 
     private var numberOfSpellToCast = 0
     private var joystickPointerId = 0
 
-    private val gameOver = GameOver(context)
-    private val performance = Performance(context, gameLoop)
+    private val gameWinScreen = WinScreenView(context, game)
+    var isKeyTaken = false
+
+    private val gameOver = GameOverView(context, game)
+    private val performance = Performance(context, gameLoop, player)
     private val gameDisplay = GameDisplay(GAME_WIDTH, GAME_HEIGHT, player)
 
     init {
-        items.add(CollectibleItem(ItemType.BOOK, book_bitmap, 2100f, 2100f, 15f, 12f))
+        items.add(CollectibleItem(ItemType.KEY, key_bitmap, 1715f, 2465f, 24f, 14f))
+        items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 284f, 2115f, 16f, 21f))
+
+        skeletonList.add(Skeleton(context, player, 2490f, 1265f))
+        skeletonList.add(Skeleton(context, player, 2667f, 1408f))
+        skeletonList.add(Skeleton(context, player, 3590f, 1623f))
+        skeletonList.add(Skeleton(context, player, 1982f, 2576f))
+        skeletonList.add(Skeleton(context, player, 2116f, 2330f))
+        skeletonList.add(Skeleton(context, player, 2116f, 2330f))
+        skeletonList.add(Skeleton(context, player, 3566f, 514f))
+        skeletonList.add(Skeleton(context, player, 965f, 1597f))
+        skeletonList.add(Skeleton(context, player, 2263f, 3665f))
+        skeletonList.add(Skeleton(context, player, 2267f, 3400f))
     }
 
     override fun render(canvas: Canvas) {
@@ -114,17 +129,28 @@ class Playing2(
 
         npc_hunter.draw(canvas, gameDisplay)
 
+        for (item in items) {
+            item.draw(canvas, gameDisplay)
+        }
+
         // Draw game panels
         joystick.draw(canvas)
         performance.draw(canvas)
+
+        dialogueManager.draw(canvas)
+        drawPauseButton(canvas)
 
         // Draw Game over if the player is dead
         if (player.getHealthPoints() <= 0) {
             gameOver.draw(canvas)
         }
 
-        dialogueManager.draw(canvas)
-        drawPauseButton(canvas)
+        // Draw Game Win if the player wins
+        if (isKeyTaken && npc_hunter.talkCount >=2
+            && (player.positionX > 3550f && player.positionX < 3650f)
+            && (player.positionY > 3100f && player.positionY < 3150f)) {
+            gameWinScreen.draw(canvas)
+        }
     }
 
     override fun update() {
@@ -150,11 +176,28 @@ class Playing2(
         if (!npc_hunter.isPlayerNearby(player)) {
             npc_hunter.hasTalked = false
         }
-        //if(Skeleton.readyToSpawn())
-        //    skeletonList.add(Skeleton(context, player))
 
         for (skeleton in skeletonList)
-            skeleton.update()
+            if(skeleton.isPlayerNearby(player)){
+                skeleton.update()
+            }
+
+
+        for (item in items) {
+            if (item.checkCollisionWithPlayer(player)) {
+                when (item.type) {
+                    ItemType.BOOK -> {/* collect book */ }
+                    ItemType.KEY -> { isKeyTaken = true }
+                    ItemType.HEALTH_POTION -> {
+                        if(player.getHealthPoints() < 5){
+                            player.setHealthPoints(player.getHealthPoints()+1)
+                        }
+                    }
+                }
+                items.remove(item) // or mark as collected
+                break // avoid ConcurrentModificationException
+            }
+        }
 
         // Update states of all spells
         while (numberOfSpellToCast > 0) {
@@ -209,6 +252,16 @@ class Playing2(
                 if(event.x > 2000 && event.y < 200){
                     game.currentGameState = Game.GameState.PAUSE
                     MusicManager.pauseMusic()
+                }
+
+                if(player.getHealthPoints() >= 0){
+                    gameOver.onTouchEvent(event)
+                }
+
+                if (isKeyTaken && npc_hunter.talkCount >=2
+                    && (player.positionX > 3550f && player.positionX < 3650f)
+                    && (player.positionY > 3100f && player.positionY < 3150f)) {
+                    gameWinScreen.onTouchEvent(event)
                 }
 
                 dialogueManager.handleTouch(event.x, event.y)
