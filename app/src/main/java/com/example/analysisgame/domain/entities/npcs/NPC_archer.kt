@@ -59,40 +59,36 @@ class NPC_archer(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
-            )
-            1 -> listOf(
-                DialogueLine("You enter a place like one where something bad happened earlier.", listOf(
+                DialogueLine("This place… it’s just like that frozen pass where we lost half the unit. Same silence. Same cold. And I swear I saw bones in the snow ahead.\n" +
+                        "How do you feel walking into a place like this again?", listOf(
 
-                    DialogueOption("It’s fine") {
+                    DialogueOption("It’s fine — I’m ready") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 13, 0))
                     },
-                    DialogueOption("A little eerie") {
+                    DialogueOption("Feels a little eerie") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 13, 1))
                     },
-                    DialogueOption("Feel nervous") {
+                    DialogueOption("Getting nervous...") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 13, 2))
                     },
-                    DialogueOption("Avoid going in") {
+                    DialogueOption("I’d rather not go in at all") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 13, 3))
                     }
                 )),
-                DialogueLine("Farewell.")
             )
-            2 -> listOf(
-                DialogueLine("You must complete a boring but necessary task.", listOf(
+            1 -> listOf(
+                DialogueLine("Before we breach the necromancer’s gate, someone has to clear the graveyard. Thirty skeletons. Won’t be glorious—but it needs doing.", listOf(
 
-                    DialogueOption("No problem") {
+                    DialogueOption("No problem — I get it done") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 15, 0))
                     },
-                    DialogueOption("It’s hard to focus") {
+                    DialogueOption("It’s hard to stay focused") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 15, 1))
                     },
-                    DialogueOption("I get distracted easily") {
+                    DialogueOption("I keep getting distracted") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 15, 2))
                     },
-                    DialogueOption("I avoid it completely") {
+                    DialogueOption("I avoid it if I can") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 15, 3))
                     }
                 )),

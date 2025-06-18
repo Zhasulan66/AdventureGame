@@ -59,11 +59,8 @@ class NPC_farmer(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
-            )
-            1 -> listOf(
-                DialogueLine("You’re given a simple quest. How do you respond?", listOf(
+                DialogueLine("Hello traveler! "),
+                DialogueLine("Listen, traveler... There's an old magic book across the lake. They say it holds power to protect our land. Could you fetch it for us?", listOf(
 
                     DialogueOption("Let’s do this!") {
                         viewModel.createAnswer(AnswerRequest(userName, 1, 2, 0))
@@ -84,18 +81,20 @@ class NPC_farmer(
                 )),
                 DialogueLine("Farewell.")
             )
-            2 -> listOf(
-                DialogueLine("You talk to an NPC with lots of info. What do you do?", listOf(
-                    DialogueOption("Read it all carefully"){
+            1 -> listOf(
+                DialogueLine("Alright, this might take a moment. The book you’re looking for—it's not just any book.\n" +
+                        " Long ago, the mage Elvar hid it beyond the lake to keep it safe from dark forces.\n" +
+                        " To find it, you’ll need to know the story, the signs, the path through the forest..", listOf(
+                    DialogueOption("Listen closely to every word"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 3, 0))
                     },
-                    DialogueOption("Skim the parts"){
+                    DialogueOption("Pay attention to the important bits"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 3, 1))
                     },
-                    DialogueOption("Forget most of it"){
+                    DialogueOption("Zone out halfway through"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 3, 2))
                     },
-                    DialogueOption("Skip through everything"){
+                    DialogueOption("Nod and skip the whole thing"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 3, 3))
                     },
                 )),

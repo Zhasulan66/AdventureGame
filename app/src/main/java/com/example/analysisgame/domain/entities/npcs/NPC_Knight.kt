@@ -59,27 +59,25 @@ class NPC_Knight(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
-            )
-            1 -> listOf(
-                DialogueLine("A bush rustles suddenly. What’s your reaction?", listOf(
-                    DialogueOption("Curious — check it out"){
+                DialogueLine("Honor to you."),
+                DialogueLine("While patrolling the woods, you hear a sudden rustle from the bushes nearby. Could be a beast... or worse. How do you respond?", listOf(
+                    DialogueOption("Curious — stride toward it"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 4, 0))
                     },
-                    DialogueOption("Cautious — approach slowly"){
+                    DialogueOption("Cautious — draw your blade and approach"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 4, 1))
                     },
-                    DialogueOption("Startled — pause or back off"){
+                    DialogueOption("Startled — step back and observe"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 4, 2))
                     },
-                    DialogueOption("Panic — run away"){
+                    DialogueOption("Panic — flee without looking back"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 4, 3))
                     },
                 )),
                 DialogueLine("Farewell.")
             )
-            2 -> listOf(
+
+            1 -> listOf(
                 DialogueLine("You’re about to enter a mysterious area. What’s your first thought?", listOf(
                     DialogueOption("Exciting! Let’s go"){
                         viewModel.createAnswer(AnswerRequest(userName, 1, 1, 0))
@@ -94,7 +92,7 @@ class NPC_Knight(
                         viewModel.createAnswer(AnswerRequest(userName, 1, 1, 3))
                     },
                 )),
-                DialogueLine("Farewell.")
+                DialogueLine("Stand tall, friend.")
             )
             else -> listOf(
                 DialogueLine("I have nothing more to say... for now.")

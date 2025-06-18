@@ -59,40 +59,35 @@ class NPC_paladin(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
-            )
-            1 -> listOf(
-                DialogueLine("A character praises your actions. How do you feel?", listOf(
+                DialogueLine("You held your ground well against those skeletons. Few have that kind of courage. You've earned my respect", listOf(
 
-                    DialogueOption("Grateful and confident") {
+                    DialogueOption("Thank you. I did what had to be done.") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 14, 0))
                     },
-                    DialogueOption("A bit awkward") {
+                    DialogueOption("Oh... uh, thanks. Just got lucky, maybe") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 14, 1))
                     },
-                    DialogueOption("It feels fake") {
+                    DialogueOption("Sure… if you say so") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 14, 2))
                     },
-                    DialogueOption("I don’t believe them") {
+                    DialogueOption("You don’t need to flatter me.") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 14, 3))
                     }
-                )),
-                DialogueLine("Farewell.")
+                ))
             )
-            2 -> listOf(
-                DialogueLine("How often do you overthink the consequences of in-game choices?", listOf(
+            1 -> listOf(
+                DialogueLine("Every choice we make in battle or beyond… it echoes. Some warriors charge ahead without pause. Others hesitate, weighing every outcome before lifting a blade.", listOf(
 
-                    DialogueOption("Rarely") {
+                    DialogueOption("I go with my gut and move on.") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 16, 0))
                     },
-                    DialogueOption("Sometimes") {
+                    DialogueOption("I think things through now and then.") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 16, 1))
                     },
-                    DialogueOption("Often") {
+                    DialogueOption("I try to plan every move") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 16, 2))
                     },
-                    DialogueOption("Constantly") {
+                    DialogueOption("I can’t stop second-guessing everything.") {
                         viewModel.createAnswer(AnswerRequest(userName, 4, 16, 3))
                     }
                 )),

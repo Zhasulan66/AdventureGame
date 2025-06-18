@@ -59,8 +59,22 @@ class NPC_hunter(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! Welcome to our village."),
-                DialogueLine("Please, make yourself at home.")
+                DialogueLine("Are you going after necromancer boss?."),
+                DialogueLine("I once met a man who lost everything when the necromancer’s army passed through—family, home, even his dog. He told me the whole story while we waited out the rain", listOf(
+
+                    DialogueOption("I listen and move on") {
+                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 0))
+                    },
+                    DialogueOption("Feel bad for them") {
+                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 1))
+                    },
+                    DialogueOption("It’s upsetting") {
+                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 2))
+                    },
+                    DialogueOption("I feel like I’m right there, living it") {
+                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 3))
+                    }
+                )),
             )
             1 -> listOf(
                 DialogueLine("After losing a battle, what do you feel?", listOf(
@@ -77,58 +91,41 @@ class NPC_hunter(
                     DialogueOption("I want to quit") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 5, 3))
                     }
-                )),
-                DialogueLine("Farewell.")
+                ))
             )
+            //action
             2 -> listOf(
-                DialogueLine("An NPC starts talking about a past disaster. How do you feel?", listOf(
+                DialogueLine("You’ll find the dungeon key at the end of the hidden path. Once you have it, wait by the gate—someone will come to open it. That’s the only way to reach the necromancer’s lair.", listOf(
 
-                    DialogueOption("I listen and move on") {
-                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 0))
-                    },
-                    DialogueOption("Feel bad for them") {
-                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 1))
-                    },
-                    DialogueOption("It’s upsetting") {
-                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 2))
-                    },
-                    DialogueOption("I feel like it’s happening to me") {
-                        viewModel.createAnswer(AnswerRequest(userName, 2, 6, 3))
-                    }
-                )),
-                DialogueLine("Farewell.")
-            )
-            3 -> listOf(
-                DialogueLine("You’re told to follow a path and wait. How do you handle it?", listOf(
-
-                    DialogueOption("Wait calmly") {
+                    DialogueOption("Stand guard and wait calmly") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 7, 0))
                     },
-                    DialogueOption("Walk in circles") {
+                    DialogueOption("Pace around the gate") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 7, 1))
                     },
-                    DialogueOption("Get agitated") {
+                    DialogueOption("Get impatient and mutter to yourself") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 7, 2))
                     },
-                    DialogueOption("Leave the area") {
+                    DialogueOption("Give up and wander off") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 7, 3))
                     }
-                )),
-                DialogueLine("Farewell.")
+                ))
             )
-            4 -> listOf(
-                DialogueLine("You forgot what your current task was. How often does that happen?", listOf(
+            3 -> listOf(
+                DialogueLine("Hmm... you’re staring at the clouds again. Don’t tell me you’ve forgotten what you were supposed to be doing.\"\n" +
+                        "\n" +
+                        "How often does that happen to you?", listOf(
 
-                    DialogueOption("Rarely") {
+                    DialogueOption("Rarely — I stay focused") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 8, 0))
                     },
-                    DialogueOption("Sometimes") {
+                    DialogueOption("Sometimes — it slips my mind") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 8, 1))
                     },
-                    DialogueOption("Often") {
+                    DialogueOption("Often — I get distracted") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 8, 2))
                     },
-                    DialogueOption("Constantly") {
+                    DialogueOption("Constantly — I forget everything") {
                         viewModel.createAnswer(AnswerRequest(userName, 2, 8, 3))
                     }
                 )),

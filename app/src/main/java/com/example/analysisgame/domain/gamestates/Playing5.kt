@@ -26,6 +26,7 @@ import com.example.analysisgame.domain.graphics.drawPauseButton
 import com.example.analysisgame.domain.map.drawTiledLayer
 import com.example.analysisgame.domain.map.loadTiledMap
 import com.example.analysisgame.domain.map.parseLayers
+import com.example.analysisgame.domain.model.AnswerRequest
 import com.example.analysisgame.presentation.game.Game
 import com.example.analysisgame.presentation.game.GameDisplay
 import com.example.analysisgame.presentation.game.GameLoop
@@ -37,7 +38,7 @@ class Playing5(
     val context: Context,
     val gameLoop: GameLoop,
     val userName: String,
-    viewModel: MainViewModel
+    val viewModel: MainViewModel
 ) : BaseState(game), GameStateInterface {
 
     private val bitmapOptions = BitmapFactory.Options().apply { inScaled = false }
@@ -95,6 +96,19 @@ class Playing5(
         items.add(CollectibleItem(ItemType.HEALTH_POTION, potion_bitmap, 407f, 544f, 16f, 21f))
     }
 
+    val px = player.positionX
+    val py = player.positionY
+
+    private var playerInAreaStartTime: Long? = null
+    private val requiredDuration = 20_000L // 20 seconds in milliseconds
+
+    // Define the area (for example, top-left at 1000,1000, 100x100 in size)
+    private val areaLeft = 580f
+    private val areaTop = 3250f
+    private val areaRight = areaLeft + 100f
+    private val areaBottom = areaTop + 100f
+
+
     override fun render(canvas: Canvas) {
         //super.draw(canvas)
         canvas.drawColor(Color.parseColor("#160f09"))
@@ -128,7 +142,7 @@ class Playing5(
         for (spell in spellList)
             spell.draw(canvas, gameDisplay)
 
-        if(bossEnemy.shouldBeRemoved || npc_mage.talkCount <= 2){
+        if(bossEnemy.shouldBeRemoved || npc_mage.talkCount <= 1){
             npc_mage.draw(canvas, gameDisplay)
         }
 
@@ -177,11 +191,32 @@ class Playing5(
 
         joystick.update()
         player.update()
+
+        val insideArea = px in areaLeft..areaRight && py in areaTop..areaBottom
+
+        if (insideArea) {
+            if (playerInAreaStartTime == null) {
+                playerInAreaStartTime = System.currentTimeMillis()
+            } else {
+                val elapsed = System.currentTimeMillis() - playerInAreaStartTime!!
+                if (elapsed >= requiredDuration) {
+                    println("Player has stayed in the area for 20 seconds!")
+                    viewModel.createAnswer(AnswerRequest(userName, 5, 18, 0))
+                    // only trigger once
+                    playerInAreaStartTime = null
+                }
+            }
+        } else {
+            // Player left the area; reset timer
+            playerInAreaStartTime = null
+            viewModel.createAnswer(AnswerRequest(userName, 5, 18, 3))
+        }
+
         if (!bossEnemy.shouldBeRemoved && bossEnemy.isPlayerNearby(player)) {
             bossEnemy.update()
         }
 
-        if(bossEnemy.shouldBeRemoved || npc_mage.talkCount <= 2) {
+        if(bossEnemy.shouldBeRemoved || npc_mage.talkCount <= 1) {
             if (npc_mage.isPlayerNearby(player)
                 && !dialogueManager.isDialogueActive
                 && !npc_mage.hasTalked
@@ -197,7 +232,7 @@ class Playing5(
             }
         }
 
-        if(npc_mage.talkCount > 2){
+        if(npc_mage.talkCount > 1){
             npc_mage.positionX = 2600f
             npc_mage.positionY = 1400f
         }

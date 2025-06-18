@@ -59,11 +59,7 @@ class NPC_elf(
     fun getDialogueLines(): List<DialogueLine> {
         return when (talkCount) {
             0 -> listOf(
-                DialogueLine("Hello traveler! You have to find 3 keys to escape the Maze"),
-                DialogueLine("Be careful, skeletons don't die from magic here")
-            )
-            1 -> listOf(
-                DialogueLine("An NPC gives you vague instructions. How do you feel?", listOf(
+                DialogueLine("Listen well, traveler. Three keys are hidden in these twisting corridors. Only with all three will the final gate yield. Beware—the skeleton sentries here laugh at magic. That’s all I can tell you.", listOf(
 
                     DialogueOption("Fine — I’ll figure it out") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 9, 0))
@@ -77,47 +73,28 @@ class NPC_elf(
                     DialogueOption("I don’t even try") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 9, 3))
                     }
-                )),
-                DialogueLine("Farewell.")
+                ))
             )
-            2 -> listOf(
-                DialogueLine("You find a big reward. How do you feel?", listOf(
+            1 -> listOf(
+                DialogueLine("Careful where you step. Just saw someone touch that pressure plate—needle popped out and bam, poison. They’re still coughing up green", listOf(
 
-                    DialogueOption("Happy and proud") {
-                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 0))
-                    },
-                    DialogueOption("It’s cool, I guess") {
-                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 1))
-                    },
-                    DialogueOption("Doesn’t matter much") {
-                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 2))
-                    },
-                    DialogueOption("I didn’t deserve it") {
-                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 3))
-                    }
-                )),
-                DialogueLine("Farewell.")
-            )
-            3 -> listOf(
-                DialogueLine("You hear a loud explosion nearby. Your reaction?", listOf(
-
-                    DialogueOption("Let’s check it out!") {
+                    DialogueOption("Stay calm and deal with it") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 11, 0))
                     },
-                    DialogueOption("Careful approach") {
+                    DialogueOption("Start checking your body frantically") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 11, 1))
                     },
-                    DialogueOption("Panic a bit") {
+                    DialogueOption("Panic and imagine the worst") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 11, 2))
                     },
-                    DialogueOption("Freeze or hide") {
+                    DialogueOption("Freeze and hope it goes away") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 11, 3))
                     }
                 )),
                 DialogueLine("Farewell.")
             )
-            4 -> listOf(
-                DialogueLine("You’re distracted mid-quest. What caused it?", listOf(
+            2 -> listOf(
+                DialogueLine("We were halfway to the crypt and suddenly you just... stopped walking. Staring off like you saw a ghost or gold. What pulled your attention?", listOf(
 
                     DialogueOption("Nothing — I’m focused") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 12, 0))
@@ -130,6 +107,25 @@ class NPC_elf(
                     },
                     DialogueOption("I don’t know — I’m always distracted") {
                         viewModel.createAnswer(AnswerRequest(userName, 3, 12, 3))
+                    }
+                )),
+            )
+            3 -> listOf(
+                DialogueLine("You did it… All three keys, and the vault opens. The reward is yours—gold, relics, and power long lost.\"\n" +
+                        "\n" +
+                        "How do you feel standing before the treasure?", listOf(
+
+                    DialogueOption("Happy and proud — I earned this") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 0))
+                    },
+                    DialogueOption("It’s cool, I guess") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 1))
+                    },
+                    DialogueOption("Feels kind of empty") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 2))
+                    },
+                    DialogueOption("I don’t think I deserve it") {
+                        viewModel.createAnswer(AnswerRequest(userName, 3, 10, 3))
                     }
                 )),
                 DialogueLine("Farewell.")

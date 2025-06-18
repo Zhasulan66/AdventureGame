@@ -149,7 +149,7 @@ class Playing4(
         }
 
         // Draw Game Win if the player wins
-        if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 3 && !npc_paladin.hasTalked) {
+        if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
             gameWinScreen.draw(canvas)
         }
     }
@@ -205,7 +205,7 @@ class Playing4(
             npc_paladin.hasTalked = false
         }
 
-        if(Skeleton.readyToSpawn() && enemyToSpawn > 0 && npc_archer.talkCount > 2) {
+        if(Skeleton.readyToSpawn() && enemyToSpawn > 0 && npc_archer.talkCount > 1) {
             skeletonList.add(
                 Skeleton(
                     context, player,
@@ -295,7 +295,7 @@ class Playing4(
                     gameOver.onTouchEvent(event)
                 }
 
-                if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 3 && !npc_paladin.hasTalked) {
+                if (enemyDefeatedCount >= 20 && npc_paladin.talkCount >= 2 && !npc_paladin.hasTalked) {
                     gameWinScreen.onTouchEvent(event)
                 }
 

@@ -17,8 +17,16 @@ class LoreScreen1(val game: Game) : BaseState(game), GameStateInterface {
         color = Color.BLACK
     }
 
-    private val loreText = "Long ago, in a forgotten land...\nThe battle between light and darkness began."
-    private val displayTime = 5000L // 5 seconds
+    private val loreText = "Long ago, our village knew only peace.\n" +
+            "But that changed when the skies darkened and the dead began to rise.\n" +
+            " The necromancer, once a forgotten name in dusty legends,\n" +
+            " returned—bringing with him an army of skeletons. They burned fields,\n" +
+            " shattered homes, and tore apart the land we loved.\n" +
+            "Now, with our village in ruins and nowhere left to run,\n" +
+            " we’ve made a choice: we fight back.\n" +
+            "We may not be heroes, but we are all that’s left.\n" +
+            "And we will end this curse at its source."
+    private val displayTime = 10000L // 5 seconds
     private var startTime = System.currentTimeMillis()
 
     override fun update() {
@@ -32,7 +40,7 @@ class LoreScreen1(val game: Game) : BaseState(game), GameStateInterface {
         c.drawRect(0f, 0f, c.width.toFloat(), c.height.toFloat(), backgroundPaint)
         val lines = loreText.split("\n")
         for ((i, line) in lines.withIndex()) {
-            c.drawText(line, c.width / 2f, 300f + i * 100f, paint)
+            c.drawText(line, c.width / 2f, 200f + i * 100f, paint)
         }
     }
 

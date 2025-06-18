@@ -133,12 +133,12 @@ fun UserSuccessScreen(
                 contentAlignment = Alignment.Center
             ){
                 StrokedText(
-                    text = "Game Name",
+                    text = "Shards of Sanity",
                     textColor = Color.White,
                     strokeColor = Color.Red,
                     myStrokeWidth = 6f,
                     fontSize = 40.sp,
-                    modifier = Modifier.offset(x = (-100).dp, y = (-40).dp)
+                    modifier = Modifier.offset(x = (-150).dp, y = (-40).dp)
                 )
             }
 

@@ -69,11 +69,11 @@ fun ProfileScreen(
 
         is Resource.Initial -> {
             // Just show a placeholder UI, logic handled in LaunchedEffect above
-            //viewModel.getUserResult(userName)
-            ProfileSuccessScreen(
+            viewModel.getUserResult(userName)
+            /*ProfileSuccessScreen(
                 navController = navController,
                 userResponse = UserResponse(0, "", "", null)
-            )
+            )*/
         }
     }
 }
