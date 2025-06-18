@@ -6,3 +6,4 @@ It's a 2d game where player can walk, attack enemies, find goods, interact with 
 
 ![game images1](app/src/main/res/drawable/game1.png)
 ![game images2](app/src/main/res/drawable/game2.png)
+
